@@ -1,0 +1,23 @@
+# Bỏ qua file tạm của Word/Excel
+~$*
+*.tmp
+*.bak
+*.old
+
+# File hệ thống Windows và Mac
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# VS Code và IDE
+.vscode/
+.idea/
+
+# Node.js, Python, Jupyter (nếu có dùng)
+node_modules/
+__pycache__/
+.ipynb_checkpoints/
+
+# File build
+dist/
+build/
