@@ -1,0 +1,28 @@
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Office temp
+~$*.docx
+~$*.xlsx
+~$*.pptx
+
+# Log
+*.log
+
+# LaTeX build
+*.aux
+*.out
+*.toc
+*.fls
+*.fdb_latexmk
+
+# Ẩn macOS
+.DS_Store
+
+# Node / Python nếu có
+node_modules/
+dist/
+__pycache__/
+*.pyc
