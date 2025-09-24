@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Infographic: Thế Giới pH Quanh Ta</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+        }
+        @media (max-width: 768px) {
+            .chart-container {
+                height: 300px;
+            }
+        }
+        .ph-scale-gradient {
+            background: linear-gradient(to right, #FF6B6B, #FFD166, #06D6A0);
+        }
+        .icon {
+            font-size: 2rem;
+            line-height: 1;
+        }
+    </style>
+</head>
+<body class="text-[#073B4C]">
+
+    <header class="bg-[#118AB2] text-white text-center py-12 px-4">
+        <h1 class="text-4xl md:text-5xl font-bold mb-2">Thế Giới pH Quanh Ta</h1>
+        <p class="text-lg md:text-xl max-w-3xl mx-auto">Khám phá độ pH của các dung dịch phổ biến và tầm quan trọng của chúng trong cuộc sống hàng ngày.</p>
+    </header>
+
+    <main class="container mx-auto p-4 md:p-8">
+
+        <section id="scale" class="mb-12">
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-3xl font-bold text-center mb-4 text-[#118AB2]">Thang Đo pH</h2>
+                <p class="text-center max-w-2xl mx-auto mb-6">Thang đo pH là một công cụ để xác định tính axit hay bazơ của một dung dịch, dao động từ 0 đến 14. Giá trị 7 là trung tính, dưới 7 là axit và trên 7 là bazơ (kiềm).</p>
+                <div class="w-full h-12 ph-scale-gradient rounded-full shadow-inner flex items-center justify-between px-2 text-white font-bold text-sm">
+                    <span class="transform -translate-x-1/2">0</span>
+                    <span class="transform -translate-x-1/2">7</span>
+                    <span class="transform -translate-x-1/2">14</span>
+                </div>
+                <div class="flex justify-between mt-2 font-semibold text-center">
+                    <div class="w-1/3 text-[#FF6B6B]">Tính Axit</div>
+                    <div class="w-1/3 text-[#073B4C]">Trung tính</div>
+                    <div class="w-1/3 text-[#06D6A0]">Tính Kiềm (Bazơ)</div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="everyday-ph" class="mb-12">
+            <h2 class="text-3xl font-bold text-center mb-8 text-[#118AB2]">Độ pH trong Cuộc Sống Hàng Ngày</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                
+                <div class="bg-white rounded-lg shadow-md p-6 flex flex-col">
+                    <h3 class="text-2xl font-bold mb-4">💧 Độ pH của Nước</h3>
+                    <p class="mb-4 flex-grow">Nước có nhiều loại với các mức pH khác nhau, ảnh hưởng trực tiếp đến sức khỏe và sinh hoạt. Biểu đồ dưới đây so sánh các ngưỡng pH an toàn theo các tiêu chuẩn khác nhau.</p>
+                    <div class="chart-container h-64">
+                        <canvas id="waterPhChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-6 flex flex-col">
+                    <h3 class="text-2xl font-bold mb-4">🧴 Sữa Rửa Mặt</h3>
+                    <p class="mb-4 flex-grow">Làn da con người có tính axit nhẹ. Sử dụng sữa rửa mặt với độ pH phù hợp giúp duy trì hàng rào bảo vệ da, tránh gây khô và kích ứng.</p>
+                    <div class="text-center my-auto">
+                        <p class="text-lg">Độ pH lý tưởng</p>
+                        <p class="text-6xl font-bold text-[#118AB2]">6 - 6.5</p>
+                        <p class="mt-2 text-sm text-gray-600">Nhỏ hơn 7 để đảm bảo hiệu quả làm sạch dịu nhẹ.</p>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-6 flex flex-col">
+                    <h3 class="text-2xl font-bold mb-4">🌱 Độ pH của Đất</h3>
+                     <p class="mb-4 flex-grow">Độ pH của đất là yếu tố quyết định đến sự sinh trưởng và phát triển của cây trồng bằng cách ảnh hưởng đến khả năng hấp thụ chất dinh dưỡng.</p>
+                    <div class="chart-container h-64">
+                        <canvas id="soilPhChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-6 flex flex-col">
+                    <h3 class="text-2xl font-bold mb-4">🩸 Cơ Thể Người</h3>
+                    <p class="mb-4 flex-grow">Cơ thể duy trì độ pH trong một khoảng rất hẹp để các cơ quan hoạt động bình thường. Độ pH của máu và nước tiểu là những chỉ số sức khỏe quan trọng.</p>
+                    <div class="space-y-4 my-auto">
+                        <div>
+                            <p class="font-bold">Máu (tĩnh mạch)</p>
+                            <div class="bg-gray-200 rounded-full h-6 relative">
+                                <div class="bg-[#06D6A0] h-6 rounded-full" style="width: 7.14%; margin-left: 52.5%;"></div>
+                            </div>
+                             <p class="text-center font-bold text-lg mt-1">7.35 - 7.45</p>
+                        </div>
+                        <div>
+                            <p class="font-bold">Nước tiểu</p>
+                            <div class="bg-gray-200 rounded-full h-6 relative">
+                                <div class="bg-[#FFD166] h-6 rounded-full" style="width: 24.2%; margin-left: 32.8%;"></div>
+                            </div>
+                             <p class="text-center font-bold text-lg mt-1">4.6 - 8.0</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow-md p-6 flex flex-col md:col-span-2 lg:col-span-1">
+                    <h3 class="text-2xl font-bold mb-4">🧪 Axit & Bazơ</h3>
+                    <p class="mb-4 flex-grow">Trong phòng thí nghiệm, các axit mạnh và bazơ mạnh có độ pH ở hai đầu cực của thang đo, thể hiện tính ăn mòn và phản ứng hóa học mạnh mẽ.</p>
+                     <div class="space-y-6 my-auto text-center">
+                        <div>
+                            <p class="text-xl font-semibold text-[#FF6B6B]">Axit (pH 0 đến <7)</p>
+                            <p class="text-gray-600">Ví dụ: HCl, H₂SO₄</p>
+                        </div>
+                         <div>
+                            <p class="text-xl font-semibold text-[#06D6A0]">Bazơ (pH >7 đến 14)</p>
+                            <p class="text-gray-600">Ví dụ: NaOH, KOH</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <section id="low-ph-solutions">
+            <h2 class="text-3xl font-bold text-center mb-8 text-[#118AB2]">Khi Nước Có Độ pH Thấp: Vấn Đề & Giải Pháp</h2>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-2xl font-bold mb-4 text-center">Dấu Hiệu Nhận Biết</h3>
+                    <p class="text-center mb-6">Nước có tính axit (pH thấp) có thể ăn mòn đường ống và các vật dụng kim loại, gây ra những dấu hiệu có thể quan sát được.</p>
+                    <ul class="space-y-4">
+                        <li class="flex items-start">
+                            <span class="icon text-[#FF6B6B] mr-4">🟤</span>
+                            <div>
+                                <h4 class="font-bold">Vết nâu đỏ</h4>
+                                <p>Xuất hiện trên các vật liệu bằng sắt, thép do bị oxy hóa.</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start">
+                             <span class="icon text-[#06D6A0] mr-4">🟢</span>
+                            <div>
+                                <h4 class="font-bold">Vết mờ xanh rêu</h4>
+                                <p>Hình thành trên các vật dụng bằng đồng như vòi nước, ống dẫn.</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="icon text-gray-500 mr-4">🔩</span>
+                            <div>
+                                <h4 class="font-bold">Ăn mòn kim loại</h4>
+                                <p>Các vật dụng kim loại bị mài mòn, hư hỏng nhanh hơn bình thường.</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-2xl font-bold mb-4 text-center">Phương Pháp Điều Chỉnh</h3>
+                    <p class="text-center mb-6">Có nhiều cách để nâng độ pH của nước, từ việc sử dụng hóa chất đến các giải pháp lọc tự nhiên và thủ công.</p>
+                     <div class="space-y-4">
+                        <div class="bg-blue-50 border-l-4 border-[#118AB2] p-4 rounded">
+                            <h4 class="font-bold">Sử Dụng Hóa Chất</h4>
+                            <p>Bơm định lượng Soda, Hypochlorite, hoặc Kali để trung hòa axit trong nước.</p>
+                        </div>
+                        <div class="bg-green-50 border-l-4 border-[#06D6A0] p-4 rounded">
+                            <h4 class="font-bold">Bộ Lọc Trung Hòa</h4>
+                            <p>Sử dụng bộ lọc chứa vật liệu Calcite (CaCO₃) hoặc Magnesia (MgO) để tăng độ pH một cách tự nhiên.</p>
+                        </div>
+                        <div class="bg-yellow-50 border-l-4 border-[#FFD166] p-4 rounded">
+                            <h4 class="font-bold">Phương Pháp Thủ Công</h4>
+                            <p>Rắc vôi bột vào ao, hồ hoặc sử dụng máy lọc nước RO ion kiềm cho nước uống.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+    
+    <footer class="text-center py-6 bg-gray-100 mt-12">
+        <p class="text-gray-600">Thông tin được tổng hợp và trực quan hóa dựa trên dữ liệu từ Famy.</p>
+    </footer>
+
+    <script>
+        const tooltipTitleCallback = (tooltipItems) => {
+            const item = tooltipItems[0];
+            let label = item.chart.data.labels[item.dataIndex];
+            if (Array.isArray(label)) {
+                return label.join(' ');
+            }
+            return label;
+        };
+
+        const chartColors = {
+            red: '#FF6B6B',
+            yellow: '#FFD166',
+            green: '#06D6A0',
+            blue: '#118AB2',
+            dark: '#073B4C'
+        };
+
+        const defaultChartOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                },
+                tooltip: {
+                    callbacks: {
+                        title: tooltipTitleCallback
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: {
+                        display: false
+                    }
+                },
+                y: {
+                    beginAtZero: true,
+                     grid: {
+                        color: '#e5e7eb'
+                    }
+                }
+            }
+        };
+
+        const waterPhCtx = document.getElementById('waterPhChart').getContext('2d');
+        new Chart(waterPhCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Nước sinh hoạt (VN)', 'Nước uống (VN)', 'Nước uống (WHO)', 'Nước ion kiềm'],
+                datasets: [{
+                    label: 'pH Tối thiểu',
+                    data: [6.0, 6.5, 6.5, 8.5],
+                    backgroundColor: chartColors.blue,
+                    borderColor: chartColors.blue,
+                    borderWidth: 1,
+                    barPercentage: 0.5,
+                }, {
+                    label: 'pH Tối đa',
+                    data: [8.5, 8.5, 9.5, 9.5],
+                    backgroundColor: chartColors.green,
+                    borderColor: chartColors.green,
+                    borderWidth: 1,
+                    barPercentage: 0.5,
+                }]
+            },
+            options: { ...defaultChartOptions,
+                indexAxis: 'y',
+                scales: {
+                     x: {
+                        beginAtZero: true,
+                        max: 14,
+                        title: { display: true, text: 'Giá trị pH'}
+                    },
+                    y: {
+                        grid: { display: false }
+                    }
+                }
+            }
+        });
+
+        const soilPhCtx = document.getElementById('soilPhChart').getContext('2d');
+        new Chart(soilPhCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Đất chua (Gây hại)', 'Đất chua (Trồng được)', 'Đất trung tính', 'Đất kiềm'],
+                datasets: [{
+                    label: 'Khoảng pH',
+                    data: [4, 7, 7, 10], 
+                    backgroundColor: [chartColors.red, chartColors.yellow, chartColors.green, chartColors.blue],
+                    borderColor: '#ffffff',
+                    borderWidth: 2
+                }]
+            },
+            options: { ...defaultChartOptions,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                         callbacks: {
+                            title: tooltipTitleCallback,
+                            label: function(context) {
+                                const label = context.chart.data.labels[context.dataIndex];
+                                let range = '';
+                                if (label === 'Đất chua (Gây hại)') range = '< 4';
+                                else if (label === 'Đất chua (Trồng được)') range = '4 - 7';
+                                else if (label === 'Đất trung tính') range = '= 7';
+                                else if (label === 'Đất kiềm') range = '> 7';
+                                return `pH: ${range}`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        max: 14,
+                        title: { display: true, text: 'Giá trị pH' }
+                    },
+                    x: {
+                        grid: { display: false }
+                    }
+                }
+            }
+        });
+
+    </script>
+</body>
+</html>
