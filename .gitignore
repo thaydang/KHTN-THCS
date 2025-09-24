@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Windows
 Thumbs.db
 ehthumbs.db
@@ -26,3 +27,28 @@ node_modules/
 dist/
 __pycache__/
 *.pyc
+=======
+# Bỏ qua file tạm của Word/Excel
+~$*
+*.tmp
+*.bak
+*.old
+
+# File hệ thống Windows và Mac
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# VS Code và IDE
+.vscode/
+.idea/
+
+# Node.js, Python, Jupyter (nếu có dùng)
+node_modules/
+__pycache__/
+.ipynb_checkpoints/
+
+# File build
+dist/
+build/
+>>>>>>> 0c400a2226d9bc4eda43ef39184412fb2b32f0fe
