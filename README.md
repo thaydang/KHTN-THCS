@@ -58,3 +58,30 @@ file Markdown để sử dụng với các hệ thống hỗ trợ MathJax.
 ## Bản quyền
 - Tài liệu tuân thủ Chương trình GDPT 2018 và công văn Bộ GD&ĐT.
 - Dùng cho mục đích dạy học, không thương mại hóa.
+
+## Công cụ soạn kế hoạch bài dạy (Markdown)
+Ứng dụng dòng lệnh trong thư mục `app/` cho phép tạo giáo án/bài giảng điện tử môn Khoa học Tự nhiên từ tệp JSON và xuất ra Markdown có hỗ trợ công thức LaTeX.
+
+### Cách sử dụng
+1. Tạo tệp cấu hình JSON theo mẫu trong `samples/grade6_light_and_shadow.json`.
+2. Chạy lệnh:
+   ```bash
+   python app/lesson_plan_generator.py path/to/config.json -o path/to/output.md
+   ```
+3. Mở tệp `.md` bằng trình soạn thảo hoặc nền tảng hỗ trợ Markdown/LaTeX để trình chiếu.
+
+
+> 📌 **Lưu ý:** Khi viết công thức LaTeX trong tệp JSON, hãy dùng hai dấu `\` để biểu diễn một dấu `\` thực tế (ví dụ: `\\dfrac{a}{b}` sẽ hiển thị thành `\dfrac{a}{b}`).
+
+### Cấu trúc tệp JSON
+- `metadata`: thông tin bài dạy (tiêu đề, ngày dạy, chủ đề, giáo viên,...).
+- `objectives`, `competencies`, `materials`: danh sách mục tiêu, năng lực và học liệu.
+- `digital_resources`: học liệu số, bài giảng điện tử.
+- `formulas`: danh sách công thức/ký hiệu với trường `latex` giữ nguyên biểu thức.
+- `activities`: mỗi hoạt động gồm thời lượng, mục tiêu, các bước (GV/HS) và học liệu số kèm theo.
+- `assessment`, `homework`, `reflection`: đánh giá, dặn dò và tự nhận xét sau bài học.
+
+Chạy thử với mẫu:
+```bash
+python app/lesson_plan_generator.py samples/grade6_light_and_shadow.json
+```
