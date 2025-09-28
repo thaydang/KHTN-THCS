@@ -1,0 +1,59 @@
+{
+  "title": "Sự bảo toàn khối lượng trong phản ứng hóa học",
+  "grade_level": "Lớp 8",
+  "topic": "Chương 2 - Phản ứng hóa học",
+  "duration": "2 tiết (90 phút)",
+  "author": "Tổ KHTN",
+  "objectives": [
+    "Phát biểu được định luật bảo toàn khối lượng.",
+    "Vận dụng được định luật vào việc giải bài tập hoá học.",
+    "Rèn luyện kỹ năng làm việc nhóm và thuyết trình."
+  ],
+  "materials": [
+    "Máy chiếu, bài giảng điện tử.",
+    "Phiếu học tập số 1, số 2.",
+    "Bộ thí nghiệm mô phỏng định luật $m_{\\text{phản ứng}} = m_{\\text{sản phẩm}}$."
+  ],
+  "activities": [
+    {
+      "phase": "Khởi động",
+      "description": "Chiếu video thí nghiệm đốt magie trong không khí, yêu cầu học sinh dự đoán khối lượng sản phẩm.",
+      "time_allocation": "10 phút"
+    },
+    {
+      "phase": "Hình thành kiến thức",
+      "description": "GV trình bày định luật bảo toàn khối lượng với công thức $\\sum m_{\\text{chất tham gia}} = \\sum m_{\\text{chất sản phẩm}}$.",
+      "time_allocation": "20 phút",
+      "notes": "Nhấn mạnh điều kiện phản ứng hoá học kín."
+    },
+    {
+      "phase": "Luyện tập",
+      "description": "HS làm bài tập giải phương trình và tính khối lượng chất trong phiếu học tập.",
+      "time_allocation": "25 phút",
+      "notes": "Bao gồm bài tập nâng cao với $n = \\frac{m}{M}$."
+    },
+    {
+      "phase": "Vận dụng",
+      "description": "Nhóm học sinh thảo luận thiết kế thí nghiệm cân bằng khối lượng.",
+      "time_allocation": "20 phút",
+      "notes": "Khuyến khích học sinh sử dụng thí nghiệm ảo."
+    },
+    {
+      "phase": "Mở rộng",
+      "description": "GV giao nhiệm vụ nghiên cứu ảnh hưởng của phản ứng bay hơi.",
+      "time_allocation": "15 phút"
+    }
+  ],
+  "assessments": [
+    "Quan sát hoạt động nhóm và ghi chú vào phiếu đánh giá.",
+    "Câu hỏi trắc nghiệm nhanh trên ứng dụng Kahoot.",
+    "Bài tập vận dụng chứa công thức LaTeX: $m = D \\cdot V$."
+  ],
+  "homework": "Hoàn thành phiếu bài tập về nhà và giải bài: $m_{Na_2CO_3} = 106 \\text{ g}$.",
+  "references": [
+    "SGK Hóa học 8 - Chân trời sáng tạo.",
+    "Thí nghiệm ảo: https://phET.colorado.edu",
+    "Giáo trình bổ trợ: Nguyễn Văn A (2020)."
+  ],
+  "notes": "Có thể chuyển đổi tài liệu này thành bài giảng điện tử bằng cách xuất sang hệ thống LMS."
+}
