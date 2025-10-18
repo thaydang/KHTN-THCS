@@ -186,7 +186,7 @@ def build_markdown(config: Dict[str, Any]) -> str:
     if reflection_section:
         lines.append("\n" + reflection_section)
 
-    return "\n\n".join(lines).strip() + "\n"
+    return "\n\n".join(lines) + "\n"
 
 
 def generate_markdown(config_path: Path, output_path: Path) -> None:
