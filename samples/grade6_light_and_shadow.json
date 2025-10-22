@@ -1,0 +1,131 @@
+{
+  "metadata": {
+    "title": "Bài dạy: Tính chất của Ánh sáng",
+    "date": "2024-09-05",
+    "grade": "Lớp 6",
+    "unit": "Chủ đề 2: Ánh sáng",
+    "topic": "Bài 8: Tán xạ ánh sáng",
+    "teacher": "Nguyễn Thị Lan",
+    "school": "THCS Trần Phú"
+  },
+  "objectives": [
+    "Mô tả được hiện tượng tán xạ ánh sáng và lấy được ví dụ trong thực tiễn.",
+    "Vận dụng được công thức tính cường độ ánh sáng giảm theo khoảng cách: $I = \\dfrac{P}{4\\pi r^2}$.",
+    "Rèn luyện năng lực giải quyết vấn đề thông qua phân tích tình huống thực tế."
+  ],
+  "competencies": [
+    "Năng lực nhận thức khoa học tự nhiên.",
+    "Năng lực tìm hiểu tự nhiên.",
+    "Phẩm chất chăm chỉ, trung thực trong học tập."
+  ],
+  "materials": [
+    "Phiếu học tập số 1 cho hoạt động thảo luận nhóm.",
+    "Bộ thí nghiệm đèn laser, màn chắn, khối mờ để minh họa tán xạ.",
+    "Máy tính, máy chiếu, loa."
+  ],
+  "digital_resources": [
+    "Slide bài giảng điện tử (file .pptx).",
+    "Mô phỏng PhET: https://phet.colorado.edu/sims/html/laser-basics/latest/laser-basics_vi.html",
+    "Video minh họa hiện tượng ánh sáng trong sương mù."
+  ],
+  "formulas": [
+    {
+      "symbol": "I",
+      "description": "Cường độ ánh sáng tại vị trí quan sát",
+      "latex": "I = \\dfrac{P}{4\\pi r^2}"
+    },
+    {
+      "symbol": "\\nabla n",
+      "description": "Độ biến thiên chiết suất trong môi trường tán xạ",
+      "latex": "\\nabla n = \\dfrac{\\Delta n}{\\Delta x}"
+    }
+  ],
+  "activities": [
+    {
+      "title": "Khởi động",
+      "duration": "10 phút",
+      "goals": [
+        "Kết nối kiến thức cũ về đường truyền của ánh sáng.",
+        "Gây hứng thú học tập thông qua tình huống thực tế."
+      ],
+      "steps": [
+        {
+          "actor": "Giáo viên",
+          "content": "Trình chiếu hình ảnh xe chạy trong sương mù và đặt câu hỏi: \"Vì sao ta thấy ánh sáng đèn pha tỏa rộng trong sương mù?\""
+        },
+        {
+          "actor": "Học sinh",
+          "content": "Trao đổi cặp đôi và trả lời nhanh trên bảng tương tác."
+        }
+      ],
+      "digital_assets": [
+        "Slide 1-2 trong bài giảng điện tử.",
+        "Video minh họa 30 giây."
+      ]
+    },
+    {
+      "title": "Hình thành kiến thức",
+      "duration": "20 phút",
+      "goals": [
+        "Học sinh quan sát thí nghiệm để rút ra khái niệm tán xạ ánh sáng.",
+        "Giải thích được công thức suy giảm cường độ ánh sáng khi lan truyền."
+      ],
+      "steps": [
+        {
+          "actor": "Giáo viên",
+          "content": "Tiến hành thí nghiệm chiếu tia laser qua khói, yêu cầu học sinh quan sát tia sáng tán xạ."
+        },
+        {
+          "actor": "Học sinh",
+          "content": "Ghi chép vào phiếu học tập và thảo luận nhóm nguyên nhân tạo nên chùm sáng."
+        },
+        {
+          "actor": "Giáo viên",
+          "content": "Giới thiệu công thức $I = \\dfrac{P}{4\\pi r^2}$ và hướng dẫn cách biến đổi để tính $r$ khi biết $I$ và $P$."
+        }
+      ],
+      "digital_assets": [
+        "Slide 5-8 minh họa thí nghiệm.",
+        "File mô phỏng PhET hướng dẫn thao tác."
+      ]
+    },
+    {
+      "title": "Luyện tập - Vận dụng",
+      "duration": "15 phút",
+      "goals": [
+        "Củng cố kiến thức bằng bài tập thực tiễn.",
+        "Phát triển năng lực giải quyết vấn đề."
+      ],
+      "steps": [
+        {
+          "actor": "Giáo viên",
+          "content": "Giao nhiệm vụ tính cường độ ánh sáng tại các khoảng cách khác nhau với $P = 120$ W."
+        },
+        {
+          "actor": "Học sinh",
+          "content": "Làm việc nhóm sử dụng bảng tính hoặc máy tính cầm tay để hoàn thành bảng số liệu."
+        },
+        {
+          "actor": "Đại diện nhóm",
+          "content": "Trình bày kết quả và nêu ý nghĩa thực tế (ứng dụng trong thiết kế đèn đường)."
+        }
+      ],
+      "digital_assets": [
+        "Bảng tính Google Sheet chia sẻ qua mã QR.",
+        "Slide 10 tổng hợp đáp án."
+      ]
+    }
+  ],
+  "assessment": [
+    "Quan sát hồ sơ học tập và sản phẩm nhóm trên Google Sheet.",
+    "Câu hỏi tự luận cuối giờ về ý nghĩa của tán xạ ánh sáng trong đời sống."
+  ],
+  "homework": [
+    "Hoàn thành bài tập 5 trang 42 SGK, trình bày bằng vở hoặc file .docx.",
+    "Chuẩn bị cho bài học sau: Tính chất khúc xạ ánh sáng, tìm ví dụ thực tế."
+  ],
+  "reflection": [
+    "Điều chỉnh thời lượng hoạt động luyện tập nếu học sinh gặp khó khăn ở phần tính toán.",
+    "Cập nhật thêm video minh họa mới nếu có tư liệu hay hơn."
+  ]
+}
