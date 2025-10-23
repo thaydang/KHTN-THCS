@@ -21,7 +21,7 @@ learning_outcomes:
 ## 1. Mục tiêu
 - Kiến thức: Nắm được vị trí Trái Đất, các hành tinh lân cận.
 - Năng lực: Tư duy không gian, giải quyết vấn đề, hợp tác.
-- Phẩm chất: Kham phá, yêu thiên nhiên.
+- Phẩm chất: Khám phá, yêu thiên nhiên.
 
 ## 2. Học liệu
 - Phần mềm Stellarium + plugin AI mô tả.
