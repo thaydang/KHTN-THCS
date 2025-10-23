@@ -1,0 +1,19 @@
+{
+  "recommendations": [
+    "yzhang.markdown-all-in-one",
+    "jebbs.plantuml",
+    "ms-python.python",
+    "james-yu.latex-workshop",
+    "shd101wyy.markdown-preview-enhanced",
+    "ritwickdey.liveserver",
+    "streetsidesoftware.code-spell-checker",
+    "charliermarsh.ruff",
+    "ms-toolsai.jupyter",
+    "ms-vscode.powershell",
+    "formulahendry.code-runner"
+  ],
+  "unwantedRecommendations": [
+    "vscode.git",
+    "vscode.github"
+  ]
+}
