@@ -20,7 +20,7 @@ INPUT="$1"
 OUTPUT="$2"
 shift 2
 
-TEMPLATE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/templates"
+TEMPLATE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")"/.. && pwd)/templates"
 
 pandoc "$INPUT" \
   --from markdown+tex_math_dollars+yaml_metadata_block \
