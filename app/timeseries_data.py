@@ -51,7 +51,12 @@ class Metadata:
 
 @dataclass
 class TimeseriesDataPoint:
-    """A single measurement point in the timeseries."""
+    """A single measurement point in the timeseries.
+    
+    Note: Currently supports temperature measurements as specified in the schema.
+    The schema requires time_s and temp_C fields. For other measurement types,
+    the schema would need to be extended.
+    """
     
     time_s: float
     temp_C: float
@@ -125,6 +130,10 @@ class TimeseriesData:
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> TimeseriesData:
         """Create TimeseriesData from a dictionary.
+        
+        Note: This implementation follows the schema specification which requires
+        time_s and temp_C fields in timeseries data points. The variables array
+        is for documentation purposes to describe what measurements are being taken.
         
         Args:
             data: Dictionary containing metadata, variables, and timeseries
