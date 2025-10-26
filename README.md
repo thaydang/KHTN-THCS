@@ -29,6 +29,23 @@ Repo này lưu trữ và chia sẻ tài liệu dạy học môn Khoa học Tự 
    git push
    ```
 
+## Công cụ Dữ liệu Chuỗi Thời gian
+
+Module `app/timeseries_data.py` và công cụ CLI `app/timeseries_tool.py` hỗ trợ lưu trữ và xác thực dữ liệu thí nghiệm theo chuỗi thời gian (ví dụ: đo nhiệt độ, áp suất theo thời gian). Xem hướng dẫn chi tiết trong `docs/TIMESERIES_GUIDE.md`.
+
+### Ví dụ sử dụng:
+```bash
+# Kiểm tra tính hợp lệ của dữ liệu
+python app/timeseries_tool.py validate samples/heating_water_experiment.json
+
+# Xem thông tin chi tiết
+python app/timeseries_tool.py info samples/heating_water_experiment.json
+
+# Tạo dữ liệu mẫu
+python app/timeseries_tool.py create-sample outputs/my_experiment.json \
+  --topic "Thí nghiệm của tôi" --device "Nhiệt kế" --num-points 10
+```
+
 ## KHTN-AI Editor
 
 Bộ công cụ trong `tools/khtn_ai_editor/` cung cấp template Pandoc, XeLaTeX, script build PDF và kho tài nguyên dùng chung lớp 6-9 theo CV7991. Xem chi tiết trong `tools/khtn_ai_editor/README.md`.
