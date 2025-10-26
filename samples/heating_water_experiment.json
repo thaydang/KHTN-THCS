@@ -1,0 +1,63 @@
+{
+  "metadata": {
+    "topic": "Nung nóng nước - Quan sát sự thay đổi nhiệt độ",
+    "device": "Nhiệt kế điện tử DS18B20",
+    "sampling_rate_hz": 0.5,
+    "created_at": "2024-10-26T10:30:00+07:00",
+    "version": "1.0"
+  },
+  "variables": [
+    {
+      "name": "time",
+      "unit": "seconds",
+      "type": "continuous"
+    },
+    {
+      "name": "temperature",
+      "unit": "Celsius",
+      "type": "continuous"
+    }
+  ],
+  "timeseries": [
+    {
+      "time_s": 0,
+      "temp_C": 25.0
+    },
+    {
+      "time_s": 2,
+      "temp_C": 28.5
+    },
+    {
+      "time_s": 4,
+      "temp_C": 32.1
+    },
+    {
+      "time_s": 6,
+      "temp_C": 35.8
+    },
+    {
+      "time_s": 8,
+      "temp_C": 39.2
+    },
+    {
+      "time_s": 10,
+      "temp_C": 42.6
+    },
+    {
+      "time_s": 12,
+      "temp_C": 46.0
+    },
+    {
+      "time_s": 14,
+      "temp_C": 49.5
+    },
+    {
+      "time_s": 16,
+      "temp_C": 52.8
+    },
+    {
+      "time_s": 18,
+      "temp_C": 56.2
+    }
+  ]
+}
