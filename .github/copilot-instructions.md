@@ -55,9 +55,31 @@ from pathlib import Path
 from typing import Dict, Any
 
 def _read_json(path: Path) -> Dict[str, Any]:
+    """Read and parse a JSON file.
+    
+    Args:
+        path: Path to the JSON file
+        
+    Returns:
+        Dictionary containing the parsed JSON data
+    """
     with path.open("r", encoding="utf-8") as stream:
         return json.load(stream)
 ```
+
+### Error Handling
+
+1. **File Operations**: Always handle `FileNotFoundError` and `PermissionError` when working with files
+2. **JSON Parsing**: Catch `json.JSONDecodeError` and provide helpful error messages
+3. **Validation**: Validate input data before processing, especially for user-provided JSON configurations
+4. **Encoding Issues**: Use `encoding="utf-8"` explicitly and handle `UnicodeDecodeError` for Vietnamese text files
+
+### Security Guidelines
+
+1. **No Hardcoded Secrets**: Never commit passwords, API keys, or credentials to the repository
+2. **File Paths**: Validate and sanitize file paths to prevent directory traversal attacks
+3. **User Input**: Always validate and sanitize user input, especially in JSON configurations
+4. **Dependencies**: Keep dependencies minimal; verify packages before adding new ones
 
 ### Documentation
 
@@ -129,6 +151,98 @@ Use the tools in `tools/khtn_ai_editor/`:
 - Build scripts in `scripts/build_pdf.sh`
 - Requires Pandoc and XeLaTeX installation
 
+## Testing, Building, and Linting
+
+### Running Tests
+
+**Unit Tests**: Use Python's built-in unittest framework
+```bash
+# Run all tests
+python -m unittest discover -s tests -v
+
+# Run a specific test file
+python -m unittest tests.test_lesson_plan_generator -v
+```
+
+**Test Requirements**:
+- All public functions in `app/` should have corresponding unit tests
+- Tests should cover normal cases, edge cases, and error conditions
+- Use descriptive test method names that explain what is being tested
+
+### Running the Application
+
+**Lesson Plan Generator**:
+```bash
+# Basic usage
+python app/lesson_plan_generator.py samples/grade6_light_and_shadow.json -o output.md
+
+# With custom output location
+python app/lesson_plan_generator.py path/to/config.json -o outputs/my_lesson.md
+```
+
+**Timeseries Tool**:
+```bash
+# Validate experiment data
+python app/timeseries_tool.py validate samples/heating_water_experiment.json
+
+# View data info
+python app/timeseries_tool.py info samples/heating_water_experiment.json
+```
+
+### Code Quality
+
+**Style Checking**: Follow PEP 8 conventions. No automated linter is currently configured, but code should:
+- Use 4 spaces for indentation (not tabs)
+- Keep lines under 100 characters when practical
+- Use snake_case for functions and variables
+- Use PascalCase for classes
+
+**Manual Validation**:
+- Run the application after making changes to ensure it works
+- Test with sample JSON files in `samples/` directory
+- Verify generated Markdown renders correctly with LaTeX expressions
+- Check that UTF-8 Vietnamese text displays properly
+
+## Commit Message Conventions
+
+Follow these guidelines for commit messages:
+
+**Format**:
+```
+<type>: <subject>
+
+[optional body]
+
+[optional footer]
+```
+
+**Types**:
+- `feat`: New feature or functionality
+- `fix`: Bug fix
+- `docs`: Documentation changes only
+- `refactor`: Code refactoring without changing functionality
+- `test`: Adding or updating tests
+- `chore`: Maintenance tasks (dependencies, build scripts)
+
+**Examples**:
+```
+feat: add support for multiple formulas in lesson plans
+
+fix: handle missing metadata fields gracefully
+
+docs: update README with timeseries tool usage
+
+refactor: extract JSON validation to separate function
+
+test: add edge case tests for empty activities list
+```
+
+**Guidelines**:
+- Keep subject line under 72 characters
+- Use imperative mood ("add" not "added" or "adds")
+- Can be written in English or Vietnamese
+- Reference issue numbers if applicable (e.g., "fix #123")
+
 ## Vietnamese Language Context
 
 **Common Terms**:
@@ -147,10 +261,94 @@ When generating or modifying content, maintain Vietnamese terminology for educat
 ## Best Practices for Contributions
 
 1. **File Naming**: Use descriptive names in Vietnamese or English (avoid special characters)
-2. **Commit Messages**: Can be in Vietnamese or English, but be descriptive
+2. **Commit Messages**: Follow the commit message conventions above
 3. **Testing**: Test generated Markdown files to ensure LaTeX expressions render correctly
 4. **Documentation Updates**: Update README.md if adding new features or changing structure
 5. **Non-commercial Use**: All materials are for educational purposes, not commercial use
+6. **Code Review**: All changes should be reviewed before merging to main branch
+
+## AI Assistant Guidelines
+
+### When to Ask for Clarification
+
+Always ask clarifying questions when:
+- Requirements are ambiguous or incomplete
+- Multiple valid approaches exist and the choice impacts the solution significantly
+- The task involves modifying critical parts of the codebase (e.g., data validation logic)
+- Security implications are unclear
+- The request conflicts with existing patterns or best practices
+- You're unsure about Vietnamese educational terminology or standards
+
+### Code Generation Expectations
+
+When generating code:
+1. **Follow Existing Patterns**: Match the style and structure of existing code
+2. **Preserve Functionality**: Don't break existing features unless specifically asked to fix them
+3. **Minimal Changes**: Make the smallest change necessary to accomplish the goal
+4. **Document Changes**: Add docstrings for new functions, update comments if logic changes
+5. **Test Compatibility**: Ensure changes work with existing test suite
+6. **Handle Errors Gracefully**: Add appropriate error handling for edge cases
+
+### Good vs Bad Code Examples
+
+**Good - Proper Error Handling**:
+```python
+def read_lesson_config(path: Path) -> Dict[str, Any]:
+    """Read lesson configuration from JSON file."""
+    try:
+        with path.open("r", encoding="utf-8") as f:
+            return json.load(f)
+    except FileNotFoundError:
+        raise FileNotFoundError(f"Configuration file not found: {path}")
+    except json.JSONDecodeError as e:
+        raise ValueError(f"Invalid JSON in {path}: {e}")
+```
+
+**Bad - No Error Handling**:
+```python
+def read_lesson_config(path: Path) -> Dict[str, Any]:
+    with path.open("r", encoding="utf-8") as f:
+        return json.load(f)
+```
+
+**Good - Type Hints and Docstring**:
+```python
+def format_duration(minutes: int) -> str:
+    """Format duration in minutes to Vietnamese text.
+    
+    Args:
+        minutes: Duration in minutes
+        
+    Returns:
+        Formatted string like "10 phút" or "1 giờ 30 phút"
+    """
+    if minutes < 60:
+        return f"{minutes} phút"
+    hours = minutes // 60
+    remaining_minutes = minutes % 60
+    if remaining_minutes == 0:
+        return f"{hours} giờ"
+    return f"{hours} giờ {remaining_minutes} phút"
+```
+
+**Bad - No Type Hints or Documentation**:
+```python
+def format_duration(m):
+    if m < 60:
+        return f"{m} phút"
+    h = m // 60
+    rm = m % 60
+    return f"{h} giờ {rm} phút" if rm > 0 else f"{h} giờ"
+```
+
+### Validation Before Implementation
+
+Before implementing significant changes:
+1. Run existing tests to establish baseline: `python -m unittest discover -s tests -v`
+2. Review related code files to understand context
+3. Check if similar functionality already exists
+4. Verify the change aligns with Vietnamese educational standards if applicable
+5. Consider impact on existing lesson plans and generated documents
 
 ## Useful Resources
 
