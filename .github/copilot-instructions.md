@@ -180,14 +180,6 @@ python app/lesson_plan_generator.py samples/grade6_light_and_shadow.json -o outp
 python app/lesson_plan_generator.py path/to/config.json -o outputs/my_lesson.md
 ```
 
-**Timeseries Tool**:
-```bash
-# Validate experiment data
-python app/timeseries_tool.py validate samples/heating_water_experiment.json
-
-# View data info
-python app/timeseries_tool.py info samples/heating_water_experiment.json
-```
 
 ### Code Quality
 
