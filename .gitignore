@@ -18,10 +18,13 @@ Desktop.ini
 node_modules/
 __pycache__/
 .ipynb_checkpoints/
+.venv/
+venv/
 
 # File build
 dist/
 build/
+outputs/
 
 # Log files
 *.log

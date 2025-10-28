@@ -71,10 +71,14 @@ class LessonPlan:
             sections.append("## Mục tiêu học tập\n" + _to_bullet_list(self.objectives))
 
         if self.materials:
-            sections.append("## Thiết bị và học liệu\n" + _to_bullet_list(self.materials))
+            sections.append(
+                "## Thiết bị và học liệu\n" + _to_bullet_list(self.materials)
+            )
 
         if self.activities:
-            activity_lines = "\n".join(activity.to_markdown() for activity in self.activities)
+            activity_lines = "\n".join(
+                activity.to_markdown() for activity in self.activities
+            )
             sections.append("## Hoạt động dạy học\n" + activity_lines)
 
         if self.assessments:
@@ -139,20 +143,26 @@ def lesson_plan_from_dict(data: Dict[str, Any]) -> LessonPlan:
 def interactive_builder() -> LessonPlan:
     """Interactively gather lesson plan information from the user."""
 
-    print("Nhập thông tin kế hoạch bài dạy KHTN. Để trống và nhấn Enter nếu không áp dụng.")
+    print(
+        "Nhập thông tin kế hoạch bài dạy KHTN. Để trống và nhấn Enter nếu không áp dụng."
+    )
     title = _prompt_required("Tiêu đề bài dạy")
     grade_level = _prompt_required("Khối lớp")
     topic = _prompt_required("Chủ đề/Chương")
     duration = _prompt_required("Thời lượng (ví dụ: 45 phút)")
     author = input("Người biên soạn: ").strip() or None
 
-    objectives = _prompt_list("Mục tiêu học tập (nhập từng mục tiêu, Enter trống để kết thúc)")
+    objectives = _prompt_list(
+        "Mục tiêu học tập (nhập từng mục tiêu, Enter trống để kết thúc)"
+    )
     materials = _prompt_list("Thiết bị/học liệu")
 
     activities: List[Activity] = []
     print("\nNhập các hoạt động dạy học (để trống tên pha để kết thúc).")
     while True:
-        phase = input("Pha hoạt động (VD: Khởi động, Hình thành kiến thức...): ").strip()
+        phase = input(
+            "Pha hoạt động (VD: Khởi động, Hình thành kiến thức...): "
+        ).strip()
         if not phase:
             break
         description = _prompt_required("Mô tả hoạt động")
