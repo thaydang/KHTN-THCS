@@ -17,23 +17,23 @@ from app.timeseries_data import TimeseriesData, create_sample_timeseries
 
 def validate_command(args: argparse.Namespace) -> int:
     """Validate a timeseries data file.
-    
+
     Args:
         args: Command-line arguments
-        
+
     Returns:
         Exit code (0 for success, 1 for failure)
     """
     input_path = Path(args.input)
-    
+
     if not input_path.exists():
         print(f"❌ Lỗi: Không tìm thấy tệp {input_path}")
         return 1
-    
+
     try:
         data = TimeseriesData.from_json_file(input_path)
         is_valid, error_msg = data.validate()
-        
+
         if is_valid:
             print(f"✅ Dữ liệu hợp lệ!")
             print(f"   📊 Số điểm dữ liệu: {len(data.timeseries)}")
@@ -51,23 +51,23 @@ def validate_command(args: argparse.Namespace) -> int:
 
 def create_sample_command(args: argparse.Namespace) -> int:
     """Create a sample timeseries data file.
-    
+
     Args:
         args: Command-line arguments
-        
+
     Returns:
         Exit code (0 for success, 1 for failure)
     """
     output_path = Path(args.output)
-    
+
     try:
         data = create_sample_timeseries(
             topic=args.topic,
             device=args.device,
             sampling_rate_hz=args.sampling_rate,
-            num_points=args.num_points
+            num_points=args.num_points,
         )
-        
+
         data.save(output_path)
         print(f"✅ Đã tạo tệp dữ liệu mẫu tại: {output_path}")
         print(f"   📊 Số điểm dữ liệu: {len(data.timeseries)}")
@@ -79,22 +79,22 @@ def create_sample_command(args: argparse.Namespace) -> int:
 
 def info_command(args: argparse.Namespace) -> int:
     """Display information about a timeseries data file.
-    
+
     Args:
         args: Command-line arguments
-        
+
     Returns:
         Exit code (0 for success, 1 for failure)
     """
     input_path = Path(args.input)
-    
+
     if not input_path.exists():
         print(f"❌ Lỗi: Không tìm thấy tệp {input_path}")
         return 1
-    
+
     try:
         data = TimeseriesData.from_json_file(input_path)
-        
+
         print("=" * 60)
         print("📊 THÔNG TIN DỮ LIỆU THÍ NGHIỆM")
         print("=" * 60)
@@ -103,11 +103,11 @@ def info_command(args: argparse.Namespace) -> int:
         print(f"⏱️  Tần số lấy mẫu: {data.metadata.sampling_rate_hz} Hz")
         print(f"📅 Thời gian tạo: {data.metadata.created_at}")
         print(f"📌 Phiên bản: {data.metadata.version}")
-        
+
         print(f"\n📈 Biến số đo lường:")
         for i, var in enumerate(data.variables, 1):
             print(f"   {i}. {var.name} ({var.unit}) - Loại: {var.type}")
-        
+
         print(f"\n📊 Dữ liệu chuỗi thời gian:")
         print(f"   Số điểm: {len(data.timeseries)}")
         if data.timeseries:
@@ -117,11 +117,13 @@ def info_command(args: argparse.Namespace) -> int:
             print(f"   Thời gian kết thúc: {last_point.time_s}s")
             print(f"   Nhiệt độ ban đầu: {first_point.temp_C}°C")
             print(f"   Nhiệt độ cuối: {last_point.temp_C}°C")
-        
+
         is_valid, error_msg = data.validate()
-        print(f"\n{'✅' if is_valid else '❌'} Tình trạng: {'Hợp lệ' if is_valid else f'Không hợp lệ - {error_msg}'}")
+        print(
+            f"\n{'✅' if is_valid else '❌'} Tình trạng: {'Hợp lệ' if is_valid else f'Không hợp lệ - {error_msg}'}"
+        )
         print("=" * 60)
-        
+
         return 0
     except Exception as e:
         print(f"❌ Lỗi khi đọc tệp: {e}")
@@ -133,68 +135,51 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Công cụ xử lý dữ liệu chuỗi thời gian cho thí nghiệm khoa học."
     )
-    
+
     subparsers = parser.add_subparsers(dest="command", help="Lệnh thực hiện")
-    
+
     # Validate command
     validate_parser = subparsers.add_parser(
-        "validate",
-        help="Kiểm tra tính hợp lệ của tệp dữ liệu"
+        "validate", help="Kiểm tra tính hợp lệ của tệp dữ liệu"
     )
-    validate_parser.add_argument(
-        "input",
-        help="Đường dẫn tệp JSON cần kiểm tra"
-    )
-    
+    validate_parser.add_argument("input", help="Đường dẫn tệp JSON cần kiểm tra")
+
     # Create sample command
-    create_parser = subparsers.add_parser(
-        "create-sample",
-        help="Tạo tệp dữ liệu mẫu"
-    )
-    create_parser.add_argument(
-        "output",
-        help="Đường dẫn tệp JSON đầu ra"
-    )
+    create_parser = subparsers.add_parser("create-sample", help="Tạo tệp dữ liệu mẫu")
+    create_parser.add_argument("output", help="Đường dẫn tệp JSON đầu ra")
     create_parser.add_argument(
         "--topic",
         default="Thí nghiệm mẫu",
-        help="Chủ đề thí nghiệm (mặc định: 'Thí nghiệm mẫu')"
+        help="Chủ đề thí nghiệm (mặc định: 'Thí nghiệm mẫu')",
     )
     create_parser.add_argument(
         "--device",
         default="Thiết bị đo mẫu",
-        help="Tên thiết bị đo (mặc định: 'Thiết bị đo mẫu')"
+        help="Tên thiết bị đo (mặc định: 'Thiết bị đo mẫu')",
     )
     create_parser.add_argument(
         "--sampling-rate",
         type=float,
         default=1.0,
-        help="Tần số lấy mẫu (Hz) (mặc định: 1.0)"
+        help="Tần số lấy mẫu (Hz) (mặc định: 1.0)",
     )
     create_parser.add_argument(
-        "--num-points",
-        type=int,
-        default=10,
-        help="Số điểm dữ liệu (mặc định: 10)"
+        "--num-points", type=int, default=10, help="Số điểm dữ liệu (mặc định: 10)"
     )
-    
+
     # Info command
     info_parser = subparsers.add_parser(
-        "info",
-        help="Hiển thị thông tin chi tiết về tệp dữ liệu"
+        "info", help="Hiển thị thông tin chi tiết về tệp dữ liệu"
     )
-    info_parser.add_argument(
-        "input",
-        help="Đường dẫn tệp JSON cần xem thông tin"
-    )
-    
+    info_parser.add_argument("input", help="Đường dẫn tệp JSON cần xem thông tin")
+
     return parser.parse_args()
 
 
 def main() -> int:
     """Main entry point."""
     args = parse_args()
-    
+
     if args.command == "validate":
         return validate_command(args)
     elif args.command == "create-sample":
