@@ -159,6 +159,132 @@ When generating or modifying content, maintain Vietnamese terminology for educat
 - [Python Dataclasses](https://docs.python.org/3/library/dataclasses.html) - For understanding code structure
 - [Pandoc Documentation](https://pandoc.org/) - For document conversion tools
 
+## Testing
+
+### Running Tests
+
+The project uses Python's built-in `unittest` framework. To run tests:
+
+```bash
+# Run all tests
+python -m unittest discover -s tests -p "test_*.py" -v
+
+# Run a specific test file
+python -m unittest tests.test_lesson_plan_generator -v
+
+# Run a specific test case
+python -m unittest tests.test_lesson_plan_generator.BuildMarkdownTests.test_formula_table_contains_latex -v
+```
+
+### Test Coverage Expectations
+
+- All new features in `app/` should include corresponding unit tests in `tests/`
+- Tests should cover normal cases, edge cases, and error conditions
+- Preserve UTF-8 encoding in test data for Vietnamese text
+- Test generated Markdown output for correct LaTeX expression rendering
+
+### Writing Tests
+
+- Use `unittest.TestCase` as the base class
+- Name test files with `test_` prefix
+- Use descriptive test method names that explain what is being tested
+- Include docstrings for complex test cases
+
+## Development Workflow
+
+### Setting Up Development Environment
+
+1. Clone the repository
+2. Ensure Python 3.7+ is installed
+3. (Optional) For PDF generation: Install Pandoc and XeLaTeX
+
+### Making Changes
+
+1. Create a new branch for your work: `git checkout -b feature/description`
+2. Make focused, minimal changes
+3. Run tests frequently: `python -m unittest discover -s tests -p "test_*.py"`
+4. Commit with descriptive messages (Vietnamese or English)
+5. Push and create a pull request
+
+### Code Quality
+
+- **Python Code Style**: Follow PEP 8 conventions
+- **Type Hints**: Use type annotations for function signatures
+- **Docstrings**: Include module and function docstrings in English
+- **Line Length**: Keep lines under 100 characters when practical
+- **Imports**: Group standard library, third-party, and local imports separately
+
+To check Python syntax:
+```bash
+python -m py_compile app/*.py
+```
+
+### Common Development Tasks
+
+**Generate a lesson plan from JSON:**
+```bash
+python app/lesson_plan_generator.py samples/grade6_light_and_shadow.json -o output.md
+```
+
+**Validate time series data:**
+```bash
+python app/timeseries_tool.py validate samples/heating_water_experiment.json
+```
+
+**Run all tests:**
+```bash
+python -m unittest discover -s tests -p "test_*.py" -v
+```
+
+## GitHub Copilot Agent Guidance
+
+### Task Types Suitable for Copilot Agent
+
+**Good Task Types:**
+- Adding new test cases for existing functionality
+- Fixing bugs with clear reproduction steps
+- Adding documentation or improving README files
+- Refactoring code to improve readability
+- Adding type hints to existing functions
+- Creating new lesson plan templates following existing patterns
+- Improving error messages and validation
+- Adding JSON schema validation
+
+**Tasks That Need Human Expertise:**
+- Educational content creation (lesson plans, test questions) - requires domain knowledge
+- Architectural decisions about project structure
+- Changes to core data models that affect multiple files
+- Vietnamese language content (grammar, terminology, cultural context)
+- Curriculum alignment decisions
+
+### Assignment Best Practices
+
+When assigning tasks to GitHub Copilot coding agent:
+
+1. **Be Specific**: Provide clear requirements and acceptance criteria
+   - ✅ Good: "Add a test case for `build_markdown()` that verifies LaTeX expressions with multiple backslashes are preserved correctly"
+   - ❌ Vague: "Improve test coverage"
+
+2. **Include Context**: Reference related files, functions, or examples
+   - Mention which files to modify: `app/lesson_plan_generator.py`
+   - Point to existing patterns: "Follow the structure in `test_lesson_plan_generator.py`"
+
+3. **Set Boundaries**: Specify what should NOT be changed
+   - "Do not modify the existing data model structure"
+   - "Preserve all existing Vietnamese text exactly as written"
+
+4. **Provide Examples**: Link to similar code or expected output
+   - "Similar to how `Activity.to_markdown()` generates output"
+   - "Follow the pattern in `samples/grade6_light_and_shadow.json`"
+
+### Copilot-Specific Guidelines
+
+- **Vietnamese Content**: When adding or modifying Vietnamese text, verify with maintainers for cultural and educational accuracy
+- **LaTeX Handling**: Always test that LaTeX expressions render correctly in Markdown viewers
+- **UTF-8 Encoding**: Explicitly use UTF-8 encoding when reading/writing files
+- **Incremental Changes**: Make small, testable changes and run tests after each change
+- **Documentation**: Update relevant README or docs when adding new features
+
 ## Notes for AI Assistants
 
 - Respect the bilingual nature: Vietnamese for educational content, English for technical code
@@ -166,3 +292,6 @@ When generating or modifying content, maintain Vietnamese terminology for educat
 - When generating lesson plans, follow Vietnamese educational standards and terminology
 - LaTeX expressions in Markdown should remain intact and properly escaped
 - Directory structure follows Vietnamese educational organization (by grade, subject area)
+- Always run tests before finalizing changes: `python -m unittest discover -s tests -p "test_*.py" -v`
+- Check Python syntax with: `python -m py_compile app/*.py`
+- For educational content changes, note that human review is essential for accuracy
