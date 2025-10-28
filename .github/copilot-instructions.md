@@ -318,9 +318,7 @@ def format_duration(minutes: int) -> str:
         return f"{minutes} phút"
     hours = minutes // 60
     remaining_minutes = minutes % 60
-    if remaining_minutes == 0:
-        return f"{hours} giờ"
-    return f"{hours} giờ {remaining_minutes} phút"
+    return f"{hours} giờ {remaining_minutes} phút" if remaining_minutes > 0 else f"{hours} giờ"
 ```
 
 **Bad - No Type Hints or Documentation**:
