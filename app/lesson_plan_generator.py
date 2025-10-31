@@ -73,7 +73,9 @@ def _coerce_activities(raw_activities: Iterable[Dict[str, Any]]) -> List[Activit
     for activity in raw_activities:
         steps = _coerce_steps(activity.get("steps", []))
         goals = [goal for goal in activity.get("goals", []) if goal]
-        digital_assets = [asset for asset in activity.get("digital_assets", []) if asset]
+        digital_assets = [
+            asset for asset in activity.get("digital_assets", []) if asset
+        ]
         activities.append(
             Activity(
                 title=activity.get("title", "Hoạt động"),
@@ -95,8 +97,12 @@ def _format_bullet_section(title: str, items: Iterable[str]) -> Optional[str]:
     return "\n".join(lines)
 
 
-def _format_table_section(title: str, rows: Iterable[Dict[str, str]], *, headers: List[str]) -> Optional[str]:
-    rows = [row for row in rows if any(row.get(header, "").strip() for header in headers)]
+def _format_table_section(
+    title: str, rows: Iterable[Dict[str, str]], *, headers: List[str]
+) -> Optional[str]:
+    rows = [
+        row for row in rows if any(row.get(header, "").strip() for header in headers)
+    ]
     if not rows:
         return None
 
@@ -139,11 +145,15 @@ def build_markdown(config: Dict[str, Any]) -> str:
     if objectives_section:
         lines.append("\n" + objectives_section)
 
-    competencies_section = _format_bullet_section("Năng lực, phẩm chất hình thành", config.get("competencies", []))
+    competencies_section = _format_bullet_section(
+        "Năng lực, phẩm chất hình thành", config.get("competencies", [])
+    )
     if competencies_section:
         lines.append("\n" + competencies_section)
 
-    materials_section = _format_bullet_section("Học liệu và thiết bị", config.get("materials", []))
+    materials_section = _format_bullet_section(
+        "Học liệu và thiết bị", config.get("materials", [])
+    )
     if materials_section:
         lines.append("\n" + materials_section)
 
@@ -158,12 +168,16 @@ def build_markdown(config: Dict[str, Any]) -> str:
         {
             "Ký hiệu": formula.get("symbol", ""),
             "Diễn giải": formula.get("description", ""),
-            "Biểu thức LaTeX": f"${formula.get('latex', '').strip()}$" if formula.get("latex") else "",
+            "Biểu thức LaTeX": (
+                f"${formula.get('latex', '').strip()}$" if formula.get("latex") else ""
+            ),
         }
         for formula in formulas
     ]
     formula_section = _format_table_section(
-        "Công thức và ký hiệu sử dụng", formula_rows, headers=["Ký hiệu", "Diễn giải", "Biểu thức LaTeX"]
+        "Công thức và ký hiệu sử dụng",
+        formula_rows,
+        headers=["Ký hiệu", "Diễn giải", "Biểu thức LaTeX"],
     )
     if formula_section:
         lines.append("\n" + formula_section)
@@ -174,15 +188,21 @@ def build_markdown(config: Dict[str, Any]) -> str:
         for activity in activities:
             lines.append("\n" + activity.to_markdown())
 
-    assessment_section = _format_bullet_section("Đánh giá", config.get("assessment", []))
+    assessment_section = _format_bullet_section(
+        "Đánh giá", config.get("assessment", [])
+    )
     if assessment_section:
         lines.append("\n" + assessment_section)
 
-    homework_section = _format_bullet_section("Hướng dẫn học tập tiếp theo", config.get("homework", []))
+    homework_section = _format_bullet_section(
+        "Hướng dẫn học tập tiếp theo", config.get("homework", [])
+    )
     if homework_section:
         lines.append("\n" + homework_section)
 
-    reflection_section = _format_bullet_section("Ghi chú và tự đánh giá", config.get("reflection", []))
+    reflection_section = _format_bullet_section(
+        "Ghi chú và tự đánh giá", config.get("reflection", [])
+    )
     if reflection_section:
         lines.append("\n" + reflection_section)
 
