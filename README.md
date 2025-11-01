@@ -106,3 +106,10 @@ Chạy thử với mẫu:
 ```bash
 python app/lesson_plan_generator.py samples/grade6_light_and_shadow.json
 ```
+
+## Gemini CLI hỗ trợ chỉnh sửa tài liệu
+
+Muốn sử dụng AI Gemini để lập kế hoạch hoặc viết lại nội dung trong kho tài liệu?
+Tham khảo hướng dẫn chi tiết và script CLI tại `docs/GEMINI_CLI_GUIDE.md`. Công cụ
+`tools/gemini_cli_editor.py` cho phép bạn lấy kế hoạch chỉnh sửa (`plan`) hoặc nhờ
+Gemini viết lại toàn bộ một tệp (`edit`) và áp dụng trực tiếp.
