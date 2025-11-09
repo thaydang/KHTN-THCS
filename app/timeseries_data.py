@@ -206,6 +206,13 @@ def create_sample_timeseries(
     Returns:
         TimeseriesData with sample measurements
     """
+    if sampling_rate_hz <= 0:
+        raise ValueError(
+            "sampling_rate_hz must be a positive value to generate sample data"
+        )
+    if num_points <= 0:
+        raise ValueError("num_points must be greater than zero")
+
     metadata = Metadata(topic=topic, device=device, sampling_rate_hz=sampling_rate_hz)
 
     variables = [
