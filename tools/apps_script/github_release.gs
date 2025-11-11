@@ -1,12 +1,10 @@
 // @ts-check
 /**
  * Công cụ Google Apps Script để xuất bản release GitHub.
- * Giữ nguyên API công khai như bản gốc nhưng bổ sung kiểm tra lỗi rõ ràng hơn
- * và loại bỏ đoạn mã trùng lặp.
+ * Phiên bản: Refined & Optimized
  */
 
 /** @typedef {GoogleAppsScript.Properties.Properties} ScriptProperties */
-/** @typedef {GoogleAppsScript.Base.Blob} Blob */
 
 /**
  * @typedef GitHubConfig
@@ -17,17 +15,18 @@
  */
 
 /**
+ * Lấy cấu hình GitHub. Sử dụng cơ chế Lazy Loading để tránh lỗi Global.
  * @returns {GitHubConfig}
  */
-function loadGitHubConfig() {
-  var props = PropertiesService.getScriptProperties();
-  var owner = props.getProperty('GITHUB_OWNER');
-  var repo = props.getProperty('GITHUB_REPO');
-  var token = props.getProperty('GITHUB_TOKEN');
+function getGitHubConfig() {
+  const props = PropertiesService.getScriptProperties();
+  const owner = props.getProperty('GITHUB_OWNER');
+  const repo = props.getProperty('GITHUB_REPO');
+  const token = props.getProperty('GITHUB_TOKEN');
 
-  if (!owner) throw new Error('Thiếu Script property GITHUB_OWNER');
-  if (!repo) throw new Error('Thiếu Script property GITHUB_REPO');
-  if (!token) throw new Error('Thiếu Script property GITHUB_TOKEN');
+  if (!owner || !repo || !token) {
+    throw new Error('Thiếu cấu hình: Vui lòng thiết lập GITHUB_OWNER, GITHUB_REPO, và GITHUB_TOKEN trong Script Properties.');
+  }
 
   return {
     owner: owner,
@@ -37,42 +36,46 @@ function loadGitHubConfig() {
   };
 }
 
-/** @type {GitHubConfig} */
-var GH = loadGitHubConfig();
-
 /**
+ * Hàm Wrapper cho UrlFetchApp
  * @param {string} path
- * @param {{ method?: GoogleAppsScript.URL_Fetch.HttpMethod, payload?: string | GoogleAppsScript.Base.BlobSource, contentType?: string }} [opts]
+ * @param {{ method?: GoogleAppsScript.URL_Fetch.HttpMethod, payload?: string | GoogleAppsScript.Base.BlobSource, contentType?: string, rawBlob?: boolean }} [opts]
  */
 function ghFetch(path, opts) {
-  if (!GH.token) throw new Error('Thiếu Script property GITHUB_TOKEN');
+  const cfg = getGitHubConfig(); // Gọi config bên trong hàm
+  const url = path.startsWith('http') ? path : cfg.api + path;
 
-  var url = GH.api + path;
-  var headers = {
-    Authorization: 'token ' + GH.token,
-    Accept: 'application/vnd.github+json',
-    'User-Agent': 'apps-script',
+  const headers = {
+    'Authorization': 'Bearer ' + cfg.token,
+    'Accept': 'application/vnd.github+json',
+    'X-GitHub-Api-Version': '2022-11-28', // Cố định version API để ổn định
+    'User-Agent': 'google-apps-script'
   };
 
-  var response = UrlFetchApp.fetch(url, {
+  // Nếu upload file blob, Content-Type sẽ được tự động xử lý bởi UrlFetchApp
+  if (opts && opts.contentType) {
+    headers['Content-Type'] = opts.contentType;
+  }
+
+  const response = UrlFetchApp.fetch(url, {
     method: (opts && opts.method) || 'get',
     muteHttpExceptions: true,
     headers: headers,
-    payload: opts && opts.payload,
-    contentType: opts && opts.contentType,
+    payload: opts && opts.payload
   });
 
-  var code = response.getResponseCode();
-  var body = response.getContentText();
+  const code = response.getResponseCode();
+  const body = response.getContentText();
 
   if (code >= 400) {
-    throw new Error('GitHub ' + code + ': ' + body);
+    throw new Error(`GitHub Error (${code}): ${body}`);
   }
 
   return body ? JSON.parse(body) : {};
 }
 
 /**
+ * Tạo Release mới
  * @param {string} tag
  * @param {string} title
  * @param {string} [body]
@@ -81,7 +84,8 @@ function ghFetch(path, opts) {
  * @param {string} [target]
  */
 function createRelease(tag, title, body, draft, prerelease, target) {
-  var payload = JSON.stringify({
+  const cfg = getGitHubConfig();
+  const payload = JSON.stringify({
     tag_name: tag,
     target_commitish: target || 'main',
     name: title || tag,
@@ -91,7 +95,7 @@ function createRelease(tag, title, body, draft, prerelease, target) {
     generate_release_notes: false,
   });
 
-  return ghFetch('/repos/' + GH.owner + '/' + GH.repo + '/releases', {
+  return ghFetch(`/repos/${cfg.owner}/${cfg.repo}/releases`, {
     method: 'post',
     payload: payload,
     contentType: 'application/json',
@@ -99,116 +103,125 @@ function createRelease(tag, title, body, draft, prerelease, target) {
 }
 
 /**
+ * Lấy thông tin Release theo Tag
  * @param {string} tag
  * @returns {any | null}
  */
 function getReleaseByTag(tag) {
+  const cfg = getGitHubConfig();
   try {
-    return ghFetch('/repos/' + GH.owner + '/' + GH.repo + '/releases/tags/' + encodeURIComponent(tag));
+    return ghFetch(`/repos/${cfg.owner}/${cfg.repo}/releases/tags/${encodeURIComponent(tag)}`);
   } catch (error) {
-    if (String(error).indexOf('404') !== -1) return null;
+    if (String(error).includes('404')) return null;
     throw error;
   }
 }
 
 /**
- * @param {string} uploadUrl
- * @param {string} fileId
+ * Upload file lên Release Asset
+ * @param {string} uploadUrlTemplate - URL trả về từ việc tạo release
+ * @param {string} fileId - ID file Google Drive
  */
-function uploadAsset(uploadUrl, fileId) {
-  var file = DriveApp.getFileById(fileId);
-  var name = file.getName();
-  var blob = file.getBlob();
+function uploadAsset(uploadUrlTemplate, fileId) {
+  const file = DriveApp.getFileById(fileId);
+  const name = file.getName();
+  const blob = file.getBlob();
 
-  var url = uploadUrl.replace('{?name,label}', '?name=' + encodeURIComponent(name));
-  var headers = {
-    Authorization: 'token ' + GH.token,
-    'Content-Type': blob.getContentType(),
-    Accept: 'application/vnd.github+json',
-    'User-Agent': 'apps-script',
+  // GitHub trả về upload_url dạng template: .../assets{?name,label}
+  // Cần cắt bỏ phần template phía sau
+  const cleanUrl = uploadUrlTemplate.split('{')[0]; 
+  const url = `${cleanUrl}?name=${encodeURIComponent(name)}`;
+
+  // Gọi trực tiếp UrlFetchApp tại đây để kiểm soát header Content-Type đặc biệt cho binary
+  const cfg = getGitHubConfig();
+  const headers = {
+    'Authorization': 'Bearer ' + cfg.token,
+    'Accept': 'application/vnd.github+json',
+    'X-GitHub-Api-Version': '2022-11-28',
+    'User-Agent': 'google-apps-script',
+    'Content-Type': blob.getContentType() // Quan trọng: Loại nội dung của file
   };
 
-  var res = UrlFetchApp.fetch(url, {
+  // LƯU Ý: Truyền trực tiếp đối tượng `blob`, KHÔNG dùng `.getBytes()` để tiết kiệm bộ nhớ
+  const res = UrlFetchApp.fetch(url, {
     method: 'post',
     headers: headers,
-    muteHttpExceptions: true,
-    payload: blob.getBytes(),
+    payload: blob, 
+    muteHttpExceptions: true
   });
 
-  var code = res.getResponseCode();
+  const code = res.getResponseCode();
   if (code >= 400) {
-    throw new Error('Upload asset fail ' + code + ': ' + res.getContentText());
+    throw new Error(`Upload asset fail (${code}): ${res.getContentText()}`);
   }
 
-  var text = res.getContentText();
-  return text ? JSON.parse(text) : {};
+  return JSON.parse(res.getContentText());
 }
 
+// --- CÁC HÀM THỰC THI (MAIN FUNCTIONS) ---
+
 function publishReleaseFromDrive() {
-  var TAG = 'v2025.11.05';
-  var TITLE = 'KHTN-THCS – phát hành giáo án & đề mẫu';
-  var DESC = [
-    '### Nội dung',
-    '- Cập nhật giáo án khối 8 chương 1',
-    "- Bổ sung đề kiểm tra 15′ chương 2",
-    '- Sửa lỗi export DOCX',
-    '',
-    '### Ghi chú',
-    'Theo chuẩn CV5512 & 7991.',
-  ].join('\n');
+  const TAG = 'v2025.11.05'; // Cập nhật tag mới
+  const TITLE = 'KHTN-THCS – phát hành giáo án & đề mẫu';
+  const DESC = `### Nội dung
+- Cập nhật giáo án khối 8 chương 1
+- Bổ sung đề kiểm tra 15′ chương 2
+- Sửa lỗi export DOCX
 
-  /** @type {string[]} */
-  var FILE_IDS = [];
+### Ghi chú
+Theo chuẩn CV5512 & 7991.`;
 
-  var existed = getReleaseByTag(TAG);
+  // Điền ID file thực tế vào đây
+  const FILE_IDS = []; 
+  // Ví dụ: const FILE_IDS = ['1xYz...ID_FILE_1...', '1xYz...ID_FILE_2...'];
+
+  const existed = getReleaseByTag(TAG);
   if (existed) {
-    throw new Error('Tag ' + TAG + ' đã tồn tại. Hãy tăng version (vd: v2025.11.05-1).');
+    throw new Error(`Tag ${TAG} đã tồn tại. Vui lòng cập nhật phiên bản.`);
   }
 
-  var rel = createRelease(TAG, TITLE, DESC, false, false, 'main');
+  Logger.log(`Đang tạo release ${TAG}...`);
+  const rel = createRelease(TAG, TITLE, DESC, false, false, 'main');
+  
+  Logger.log(`Tạo thành công: ${rel.html_url}. Đang upload assets...`);
 
-  for (var i = 0; i < FILE_IDS.length; i += 1) {
-    uploadAsset(rel.upload_url, FILE_IDS[i]);
+  for (const fileId of FILE_IDS) {
+    try {
+      uploadAsset(rel.upload_url, fileId);
+      Logger.log(`- Đã upload file ID: ${fileId}`);
+    } catch (e) {
+      Logger.log(`- Lỗi upload file ID ${fileId}: ${e.message}`);
+    }
   }
 
-  Logger.log('OK: ' + rel.html_url);
+  Logger.log('Hoàn tất quá trình phát hành.');
   return rel.html_url;
 }
 
 /**
- * @param {string} [titlePrefix]
- * @param {string} [body]
+ * Tự động tăng phiên bản Patch (x.x.X+1)
  */
 function createPatchReleaseAuto(titlePrefix, body) {
-  var rels = ghFetch('/repos/' + GH.owner + '/' + GH.repo + '/releases?per_page=1');
-  var next = 'v1.0.0';
+  const cfg = getGitHubConfig();
+  // Lấy release mới nhất
+  const rels = ghFetch(`/repos/${cfg.owner}/${cfg.repo}/releases?per_page=1`);
+  let next = 'v1.0.0';
 
-  if (rels && rels.length) {
-    var latest = String(rels[0].tag_name || '');
-    var match = latest.match(/^v(\d+)\.(\d+)\.(\d+)$/);
+  if (rels && rels.length > 0) {
+    const latest = String(rels[0].tag_name || '');
+    const match = latest.match(/^v(\d+)\.(\d+)\.(\d+)$/);
     if (match) {
-      var major = Number(match[1]);
-      var minor = Number(match[2]);
-      var patch = Number(match[3]);
-      next = 'v' + major + '.' + minor + '.' + (patch + 1);
+      const major = Number(match[1]);
+      const minor = Number(match[2]);
+      const patch = Number(match[3]);
+      next = `v${major}.${minor}.${patch + 1}`;
     }
   }
 
-  var rel = createRelease(next, (titlePrefix || 'Auto Release') + ' ' + next, body || '');
-  Logger.log(rel.html_url);
+  const title = `${titlePrefix || 'Auto Release'} ${next}`;
+  const rel = createRelease(next, title, body || 'Tự động phát hành bởi Apps Script');
+  
+  Logger.log(`Đã tạo Patch Release mới: ${rel.html_url}`);
   return rel.html_url;
 }
 
-function testGitHubToken() {
-  var token = PropertiesService.getScriptProperties().getProperty('GITHUB_TOKEN');
-  if (!token) throw new Error('Thiếu Script property GITHUB_TOKEN');
-
-  var res = UrlFetchApp.fetch('https://api.github.com/user', {
-    headers: {
-      Authorization: 'token ' + token,
-      'User-Agent': 'apps-script',
-    },
-  });
-
-  Logger.log(res.getContentText());
-}
