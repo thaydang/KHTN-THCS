@@ -31,19 +31,20 @@ params:
 import random
 from typing import Dict, List
 
-def _as_positive_int(raw_value, name: str) -> int:
+def _as_positive_int(raw_value, name: str, allow_zero: bool = False) -> int:
     try:
         value = int(raw_value)
     except (TypeError, ValueError) as exc:
         raise ValueError(f"Tham số {name} phải là số nguyên.") from exc
-    if value <= 0:
-        raise ValueError(f"Tham số {name} phải lớn hơn 0.")
+    if value < 0 or (not allow_zero and value == 0):
+        limit = "không âm" if allow_zero else "lớn hơn 0"
+        raise ValueError(f"Tham số {name} phải {limit}.")
     return value
 
 
-seed_value = _as_positive_int(params["seed"], "seed")
-num_mcq = _as_positive_int(params["num_mcq"], "num_mcq")
-num_essay = _as_positive_int(params["num_essay"], "num_essay")
+seed_value = _as_positive_int(params["seed"], "seed", allow_zero=True)
+num_mcq = _as_positive_int(params["num_mcq"], "num_mcq", allow_zero=True)
+num_essay = _as_positive_int(params["num_essay"], "num_essay", allow_zero=True)
 duration_minutes = _as_positive_int(params["duration_minutes"], "duration_minutes")
 
 rng = random.Random(seed_value)
