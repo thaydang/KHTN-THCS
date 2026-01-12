@@ -130,13 +130,12 @@ def build_essay_bank() -> List[Dict[str, str]]:
 
 
 def pick_items(bank: List[Dict[str, str]], count: int) -> List[Dict[str, str]]:
-    if count < 0:
-        raise ValueError("Số lượng câu hỏi phải không âm.")
-    if count > len(bank):
+    validated_count = _as_positive_int(count, "số lượng câu hỏi", allow_zero=True)
+    if validated_count > len(bank):
         raise ValueError(
-            f"Không đủ câu hỏi trong ngân hàng (cần {count}, có {len(bank)})."
+            f"Không đủ câu hỏi trong ngân hàng (cần {validated_count}, có {len(bank)})."
         )
-    return rng.sample(bank, k=count)
+    return rng.sample(bank, k=validated_count)
 
 
 mcq_items = pick_items(build_mcq_bank(), num_mcq)
