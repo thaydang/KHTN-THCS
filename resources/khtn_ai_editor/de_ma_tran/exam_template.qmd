@@ -41,8 +41,8 @@ def build_mcq_bank() -> List[Dict[str, str]]:
             "options": [
                 r"$p = \\dfrac{F}{S}$",
                 r"$p = \\rho g h$",
-                r"$p = \\dfrac{N}{m}$",
-                r"$p = U I$",
+                r"$p = \\dfrac{N}{m^2}$",
+                r"$p = U \\cdot I$",
             ],
             "answer": "B",
         },
@@ -77,12 +77,12 @@ def build_mcq_bank() -> List[Dict[str, str]]:
             "answer": "C",
         },
         {
-            "question": "Biểu thức công cơ học của áp suất chất lỏng tác dụng lên diện tích S?",
+            "question": "Lực do áp suất chất lỏng tác dụng lên diện tích $S$?",
             "options": [
-                r"$A = p \\cdot S$",
-                r"$A = p \\cdot h$",
-                r"$A = F \\cdot S$",
-                r"$A = \\rho \\cdot S$",
+                r"$F = p \\cdot S$",
+                r"$F = p \\cdot h$",
+                r"$F = \\dfrac{p}{S}$",
+                r"$F = \\rho g$",
             ],
             "answer": "A",
         },
@@ -99,9 +99,9 @@ def build_essay_bank() -> List[Dict[str, str]]:
         },
         {
             "question": (
-                "Tính áp suất của cột nước cao $12\\,\\text{m}$ (lấy "
-                r"$\\rho = 1000\\,\\text{kg/m}^3$, $g = 9{,}8\\,\\text{m/s}^2$) "
-                "và nhận xét khả năng vỡ của bể đặt trên cao."
+                r"Tính áp suất của cột nước cao $12\,\text{m}$ (lấy "
+                r"$\rho = 1000\,\text{kg/m}^3$, $g = 9{,}8\,\text{m/s}^2$) "
+                r"và nhận xét khả năng vỡ của bể đặt trên cao."
             )
         },
         {
