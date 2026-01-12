@@ -39,10 +39,10 @@ def build_mcq_bank() -> List[Dict[str, str]]:
         {
             "question": "Công thức áp suất thủy tĩnh là gì?",
             "options": [
-                r"$p = \\dfrac{F}{S}$",
-                r"$p = \\rho g h$",
-                r"$p = \\dfrac{N}{m^2}$",
-                r"$p = U \\cdot I$",
+                r"$p = \dfrac{F}{S}$",
+                r"$p = \rho g h$",
+                r"$p = \dfrac{N}{m^2}$",
+                r"$p = U \cdot I$",
             ],
             "answer": "B",
         },
@@ -79,10 +79,10 @@ def build_mcq_bank() -> List[Dict[str, str]]:
         {
             "question": "Lực do áp suất chất lỏng tác dụng lên diện tích $S$?",
             "options": [
-                r"$F = p \\cdot S$",
-                r"$F = p \\cdot h$",
-                r"$F = \\dfrac{p}{S}$",
-                r"$F = \\rho g$",
+                r"$F = p \cdot S$",
+                r"$F = p \cdot h$",
+                r"$F = \dfrac{p}{S}$",
+                r"$F = \rho g$",
             ],
             "answer": "A",
         },
@@ -100,14 +100,14 @@ def build_essay_bank() -> List[Dict[str, str]]:
         {
             "question": (
                 r"Tính áp suất của cột nước cao $12\,\text{m}$ (lấy "
-                r"$\rho = 1000\,\text{kg/m}^3$, $g = 9{,}8\,\text{m/s}^2$) "
+                r"$\rho = 1000\,\text{kg/m}^3$, $g = 9.8\,\text{m/s}^2$) "
                 r"và nhận xét khả năng vỡ của bể đặt trên cao."
             )
         },
         {
             "question": (
-                "Thiết kế thí nghiệm kiểm chứng công thức $p = \\rho g h$ bằng "
-                "cột chất lỏng và mô tả cách giảm sai số."
+                r"Thiết kế thí nghiệm kiểm chứng công thức $p = \rho g h$ bằng "
+                r"cột chất lỏng và mô tả cách giảm sai số."
             )
         },
     ]
@@ -133,10 +133,19 @@ print(f"- Hạt giống (seed): {params['seed']} — đổi seed để sinh bi�
 ## Cấu trúc & ma trận (minh hoạ)
 
 ```{python}
+mcq_points_total = 4.0
+essay_points_total = 10.0 - mcq_points_total
+
 print("| Phần | Nội dung | Số câu | Điểm | Nhận xét |")
 print("|------|----------|--------|------|----------|")
-print(f"| I    | Áp suất chất lỏng | {params['num_mcq']} TN | 4.0 | Nhận biết, thông hiểu |")
-print("| II   | Áp suất khí quyển | 2 TL | 6.0 | Vận dụng |")
+print(
+    f"| I    | Áp suất chất lỏng | {params['num_mcq']} TN | "
+    f"{mcq_points_total:.1f} | Nhận biết, thông hiểu |"
+)
+print(
+    f"| II   | Áp suất khí quyển | {params['num_essay']} TL | "
+    f"{essay_points_total:.1f} | Vận dụng |"
+)
 ```
 
 ## Phần I: Trắc nghiệm
