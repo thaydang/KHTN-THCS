@@ -31,10 +31,20 @@ params:
 import random
 from typing import Dict, List
 
-try:
-    seed_value = int(params["seed"])
-except (TypeError, ValueError) as exc:
-    raise ValueError("Tham số seed phải là số nguyên.") from exc
+def _as_positive_int(raw_value, name: str) -> int:
+    try:
+        value = int(raw_value)
+    except (TypeError, ValueError) as exc:
+        raise ValueError(f"Tham số {name} phải là số nguyên.") from exc
+    if value <= 0:
+        raise ValueError(f"Tham số {name} phải lớn hơn 0.")
+    return value
+
+
+seed_value = _as_positive_int(params["seed"], "seed")
+num_mcq = _as_positive_int(params["num_mcq"], "num_mcq")
+num_essay = _as_positive_int(params["num_essay"], "num_essay")
+duration_minutes = _as_positive_int(params["duration_minutes"], "duration_minutes")
 
 rng = random.Random(seed_value)
 
@@ -58,7 +68,7 @@ def build_mcq_bank() -> List[Dict[str, str]]:
         },
         {
             "question": "Thiết bị đo áp suất khí quyển tiêu chuẩn?",
-            "options": ["Lực kế", "Nhiệt kế", "Khí áp kế thuỷ ngân", "Vôn kế"],
+            "options": ["Lực kế", "Nhiệt kế", "Khí áp kế thủy ngân", "Vôn kế"],
             "answer": "C",
         },
         {
@@ -119,6 +129,8 @@ def build_essay_bank() -> List[Dict[str, str]]:
 
 
 def pick_items(bank: List[Dict[str, str]], count: int) -> List[Dict[str, str]]:
+    if count < 0:
+        raise ValueError("Số lượng câu hỏi phải không âm.")
     if count > len(bank):
         raise ValueError(
             f"Không đủ câu hỏi trong ngân hàng (cần {count}, có {len(bank)})."
@@ -126,8 +138,8 @@ def pick_items(bank: List[Dict[str, str]], count: int) -> List[Dict[str, str]]:
     return rng.sample(bank, k=count)
 
 
-mcq_items = pick_items(build_mcq_bank(), params["num_mcq"])
-essay_items = pick_items(build_essay_bank(), params["num_essay"])
+mcq_items = pick_items(build_mcq_bank(), num_mcq)
+essay_items = pick_items(build_essay_bank(), num_essay)
 ```
 
 ## Thông tin đề
@@ -135,7 +147,7 @@ essay_items = pick_items(build_essay_bank(), params["num_essay"])
 ```{python}
 print(f"- Mã đề: {params['exam_code']} (phiên bản {params['version']})")
 print(f"- Chủ đề: {params['topic']}")
-print(f"- Thời lượng: {params['duration_minutes']} phút")
+print(f"- Thời lượng: {duration_minutes} phút")
 print(f"- Hạt giống (seed): {params['seed']} — đổi seed để sinh biến thể khác.")
 ```
 
@@ -149,11 +161,11 @@ essay_points_total = TOTAL_POINTS - mcq_points_total
 print("| Phần | Nội dung | Số câu | Điểm | Nhận xét |")
 print("|------|----------|--------|------|----------|")
 print(
-    f"| I    | Áp suất chất lỏng | {params['num_mcq']} TN | "
+    f"| I    | Áp suất chất lỏng | {num_mcq} TN | "
     f"{mcq_points_total:.1f} | Nhận biết, thông hiểu |"
 )
 print(
-    f"| II   | Áp suất khí quyển | {params['num_essay']} TL | "
+    f"| II   | Áp suất khí quyển | {num_essay} TL | "
     f"{essay_points_total:.1f} | Vận dụng |"
 )
 ```
