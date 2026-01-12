@@ -49,6 +49,14 @@ python app/timeseries_tool.py create-sample outputs/my_experiment.json \
 ## KHTN-AI Editor
 
 Bộ công cụ trong `tools/khtn_ai_editor/` cung cấp template Pandoc, XeLaTeX, script build PDF và kho tài nguyên dùng chung lớp 6-9 theo CV7991. Xem chi tiết trong `tools/khtn_ai_editor/README.md`.
+
+### Mẫu đề thi Quarto (tham số hóa seed)
+- File mẫu: `resources/khtn_ai_editor/de_ma_tran/exam_template.qmd`
+- Render và tạo biến thể mã đề bằng cách thay `seed`/`exam_code`:
+  ```bash
+  quarto render resources/khtn_ai_editor/de_ma_tran/exam_template.qmd \
+    -P seed=202501 -P version=B -P exam_code=GK-KHTN8-2025
+  ```
 ## Ứng dụng tạo kế hoạch bài dạy KHTN
 
 Thư mục `tools/lesson_planner/` chứa script Python hỗ trợ soạn giáo án/bài giảng điện tử

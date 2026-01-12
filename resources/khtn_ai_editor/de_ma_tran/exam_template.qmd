@@ -1,0 +1,197 @@
+---
+title: "Đề kiểm tra KHTN (Quarto)"
+subtitle: "Mẫu tham số hóa cho nhiều mã đề"
+author: "Tổ Khoa học Tự nhiên"
+lang: vi
+format:
+  pdf:
+    toc: true
+    number-sections: true
+    pdf-engine: xelatex
+params:
+  seed: 42
+  exam_code: "GK-KHTN8-2024"
+  version: "A"
+  topic: "Áp suất chất lỏng và khí quyển"
+  duration_minutes: 45
+  num_mcq: 6
+  num_essay: 2
+  include_answers: true
+---
+
+> Render Quarto với tham số tùy chỉnh (đổi `seed` để sinh biến thể đề):
+> ```bash
+> quarto render resources/khtn_ai_editor/de_ma_tran/exam_template.qmd \
+>   -P seed=202501 -P version=B -P exam_code=GK-KHTN8-2025
+> ```
+
+## Thiết lập & sinh câu hỏi (Python)
+
+```{python}
+import random
+from typing import Dict, List
+
+def _as_positive_int(raw_value, name: str, allow_zero: bool = False) -> int:
+    try:
+        value = int(raw_value)
+    except (TypeError, ValueError) as exc:
+        raise ValueError(f"Tham số {name} phải là số nguyên.") from exc
+    if value < 0 or (not allow_zero and value == 0):
+        limit = "không âm" if allow_zero else "lớn hơn 0"
+        raise ValueError(f"Tham số {name} phải {limit}.")
+    return value
+
+
+seed_value = _as_positive_int(params["seed"], "seed", allow_zero=True)
+num_mcq = _as_positive_int(params["num_mcq"], "num_mcq", allow_zero=True)
+num_essay = _as_positive_int(params["num_essay"], "num_essay", allow_zero=True)
+duration_minutes = _as_positive_int(params["duration_minutes"], "duration_minutes")
+
+rng = random.Random(seed_value)
+
+
+def build_mcq_bank() -> List[Dict[str, str]]:
+    return [
+        {
+            "question": "Công thức áp suất thủy tĩnh là gì?",
+            "options": [
+                r"$p = \dfrac{F}{S}$",
+                r"$p = \rho g h$",
+                r"$p = \dfrac{N}{m^2}$",
+                r"$p = U \cdot I$",
+            ],
+            "answer": "B",
+        },
+        {
+            "question": "Đơn vị đo áp suất trong hệ SI?",
+            "options": ["Newton", "Pascal", "Joule", "Watt"],
+            "answer": "B",
+        },
+        {
+            "question": "Thiết bị đo áp suất khí quyển tiêu chuẩn?",
+            "options": ["Lực kế", "Nhiệt kế", "Khí áp kế thủy ngân", "Vôn kế"],
+            "answer": "C",
+        },
+        {
+            "question": "Độ sâu h càng lớn thì áp suất chất lỏng thay đổi như thế nào?",
+            "options": [
+                "Giảm dần",
+                "Tăng dần",
+                "Không đổi",
+                "Bằng 0 tại mọi điểm",
+            ],
+            "answer": "B",
+        },
+        {
+            "question": "Chọn phát biểu đúng về áp suất khí quyển:",
+            "options": [
+                "Không phụ thuộc độ cao",
+                "Tăng khi lên cao",
+                "Giảm khi lên cao",
+                "Luôn bằng áp suất chuẩn 101325 Pa",
+            ],
+            "answer": "C",
+        },
+        {
+            "question": "Lực do áp suất chất lỏng tác dụng lên diện tích $S$?",
+            "options": [
+                r"$F = p \cdot S$",
+                r"$F = p \cdot h$",
+                r"$F = \dfrac{p}{S}$",
+                r"$F = \rho g$",
+            ],
+            "answer": "A",
+        },
+    ]
+
+
+def build_essay_bank() -> List[Dict[str, str]]:
+    return [
+        {
+            "question": (
+                "Giải thích vì sao nước ngầm trong giếng thường dâng cao gần bằng "
+                "mực nước sông, liên hệ với áp suất khí quyển."
+            )
+        },
+        {
+            "question": (
+                r"Tính áp suất của cột nước cao $12\,\text{m}$ (lấy "
+                r"$\rho = 1000\,\text{kg/m}^3$, $g = 9.8\,\text{m/s}^2$) "
+                r"và nhận xét khả năng vỡ của bể đặt trên cao."
+            )
+        },
+        {
+            "question": (
+                r"Thiết kế thí nghiệm kiểm chứng công thức $p = \rho g h$ bằng "
+                r"cột chất lỏng và mô tả cách giảm sai số."
+            )
+        },
+    ]
+
+
+def pick_items(bank: List[Dict[str, str]], count: int) -> List[Dict[str, str]]:
+    validated_count = _as_positive_int(count, "số lượng câu hỏi", allow_zero=True)
+    if validated_count > len(bank):
+        raise ValueError(
+            f"Không đủ câu hỏi trong ngân hàng (cần {validated_count}, có {len(bank)})."
+        )
+    return rng.sample(bank, k=validated_count)
+
+
+mcq_items = pick_items(build_mcq_bank(), num_mcq)
+essay_items = pick_items(build_essay_bank(), num_essay)
+```
+
+## Thông tin đề
+
+```{python}
+print(f"- Mã đề: {params['exam_code']} (phiên bản {params['version']})")
+print(f"- Chủ đề: {params['topic']}")
+print(f"- Thời lượng: {duration_minutes} phút")
+print(f"- Hạt giống (seed): {params['seed']} — đổi seed để sinh biến thể khác.")
+```
+
+## Cấu trúc & ma trận (minh hoạ)
+
+```{python}
+TOTAL_POINTS = 10.0
+mcq_points_total = 4.0
+essay_points_total = TOTAL_POINTS - mcq_points_total
+
+print("| Phần | Nội dung | Số câu | Điểm | Nhận xét |")
+print("|------|----------|--------|------|----------|")
+print(
+    f"| I    | Áp suất chất lỏng | {num_mcq} TN | "
+    f"{mcq_points_total:.1f} | Nhận biết, thông hiểu |"
+)
+print(
+    f"| II   | Áp suất khí quyển | {num_essay} TL | "
+    f"{essay_points_total:.1f} | Vận dụng |"
+)
+```
+
+## Phần I: Trắc nghiệm
+
+```{python}
+for idx, q in enumerate(mcq_items, 1):
+    print(f"{idx}. {q['question']}")
+    for opt_idx, opt in enumerate(q['options']):
+        print(f"   {chr(65 + opt_idx)}. {opt}")
+    print()
+```
+
+## Phần II: Tự luận
+
+```{python}
+for idx, q in enumerate(essay_items, 1):
+    print(f"{idx}. {q['question']}")
+    print()
+```
+
+## Đáp án nhanh (ẩn/hiện qua tham số)
+
+```{python}
+if params["include_answers"]:
+    for idx, q in enumerate(mcq_items, 1):
+        print(f"- Câu {idx}: {q['answer']}")
+```
