@@ -31,7 +31,12 @@ params:
 import random
 from typing import Dict, List
 
-rng = random.Random(params["seed"])
+try:
+    seed_value = int(params["seed"])
+except (TypeError, ValueError) as exc:
+    raise ValueError("Tham số seed phải là số nguyên.") from exc
+
+rng = random.Random(seed_value)
 
 
 def build_mcq_bank() -> List[Dict[str, str]]:
@@ -114,7 +119,11 @@ def build_essay_bank() -> List[Dict[str, str]]:
 
 
 def pick_items(bank: List[Dict[str, str]], count: int) -> List[Dict[str, str]]:
-    return rng.sample(bank, k=min(count, len(bank)))
+    if count > len(bank):
+        raise ValueError(
+            f"Không đủ câu hỏi trong ngân hàng (cần {count}, có {len(bank)})."
+        )
+    return rng.sample(bank, k=count)
 
 
 mcq_items = pick_items(build_mcq_bank(), params["num_mcq"])
@@ -133,8 +142,9 @@ print(f"- Hạt giống (seed): {params['seed']} — đổi seed để sinh bi�
 ## Cấu trúc & ma trận (minh hoạ)
 
 ```{python}
+TOTAL_POINTS = 10.0
 mcq_points_total = 4.0
-essay_points_total = 10.0 - mcq_points_total
+essay_points_total = TOTAL_POINTS - mcq_points_total
 
 print("| Phần | Nội dung | Số câu | Điểm | Nhận xét |")
 print("|------|----------|--------|------|----------|")
