@@ -1,0 +1,166 @@
+---
+title: "Đề kiểm tra KHTN (Quarto)"
+subtitle: "Mẫu tham số hóa cho nhiều mã đề"
+author: "Tổ Khoa học Tự nhiên"
+lang: vi
+format:
+  pdf:
+    toc: true
+    number-sections: true
+    pdf-engine: xelatex
+params:
+  seed: 42
+  exam_code: "GK-KHTN8-2024"
+  version: "A"
+  topic: "Áp suất chất lỏng và khí quyển"
+  duration_minutes: 45
+  num_mcq: 6
+  num_essay: 2
+  include_answers: true
+---
+
+> Render Quarto với tham số tùy chỉnh (đổi `seed` để sinh biến thể đề):
+> ```bash
+> quarto render resources/khtn_ai_editor/de_ma_tran/exam_template.qmd \
+>   -P seed=202501 -P version=B -P exam_code=GK-KHTN8-2025
+> ```
+
+## Thiết lập & sinh câu hỏi (Python)
+
+```{python}
+import random
+from typing import Dict, List
+
+rng = random.Random(params["seed"])
+
+
+def build_mcq_bank() -> List[Dict[str, str]]:
+    return [
+        {
+            "question": "Công thức áp suất thủy tĩnh là gì?",
+            "options": [
+                r"$p = \\dfrac{F}{S}$",
+                r"$p = \\rho g h$",
+                r"$p = \\dfrac{N}{m}$",
+                r"$p = U I$",
+            ],
+            "answer": "B",
+        },
+        {
+            "question": "Đơn vị đo áp suất trong hệ SI?",
+            "options": ["Newton", "Pascal", "Joule", "Watt"],
+            "answer": "B",
+        },
+        {
+            "question": "Thiết bị đo áp suất khí quyển tiêu chuẩn?",
+            "options": ["Lực kế", "Nhiệt kế", "Khí áp kế thuỷ ngân", "Vôn kế"],
+            "answer": "C",
+        },
+        {
+            "question": "Độ sâu h càng lớn thì áp suất chất lỏng thay đổi như thế nào?",
+            "options": [
+                "Giảm dần",
+                "Tăng dần",
+                "Không đổi",
+                "Bằng 0 tại mọi điểm",
+            ],
+            "answer": "B",
+        },
+        {
+            "question": "Chọn phát biểu đúng về áp suất khí quyển:",
+            "options": [
+                "Không phụ thuộc độ cao",
+                "Tăng khi lên cao",
+                "Giảm khi lên cao",
+                "Luôn bằng áp suất chuẩn 101325 Pa",
+            ],
+            "answer": "C",
+        },
+        {
+            "question": "Biểu thức công cơ học của áp suất chất lỏng tác dụng lên diện tích S?",
+            "options": [
+                r"$A = p \\cdot S$",
+                r"$A = p \\cdot h$",
+                r"$A = F \\cdot S$",
+                r"$A = \\rho \\cdot S$",
+            ],
+            "answer": "A",
+        },
+    ]
+
+
+def build_essay_bank() -> List[Dict[str, str]]:
+    return [
+        {
+            "question": (
+                "Giải thích vì sao nước ngầm trong giếng thường dâng cao gần bằng "
+                "mực nước sông, liên hệ với áp suất khí quyển."
+            )
+        },
+        {
+            "question": (
+                "Tính áp suất của cột nước cao $12\\,\\text{m}$ (lấy "
+                r"$\\rho = 1000\\,\\text{kg/m}^3$, $g = 9{,}8\\,\\text{m/s}^2$) "
+                "và nhận xét khả năng vỡ của bể đặt trên cao."
+            )
+        },
+        {
+            "question": (
+                "Thiết kế thí nghiệm kiểm chứng công thức $p = \\rho g h$ bằng "
+                "cột chất lỏng và mô tả cách giảm sai số."
+            )
+        },
+    ]
+
+
+def pick_items(bank: List[Dict[str, str]], count: int) -> List[Dict[str, str]]:
+    return rng.sample(bank, k=min(count, len(bank)))
+
+
+mcq_items = pick_items(build_mcq_bank(), params["num_mcq"])
+essay_items = pick_items(build_essay_bank(), params["num_essay"])
+```
+
+## Thông tin đề
+
+```{python}
+print(f"- Mã đề: {params['exam_code']} (phiên bản {params['version']})")
+print(f"- Chủ đề: {params['topic']}")
+print(f"- Thời lượng: {params['duration_minutes']} phút")
+print(f"- Hạt giống (seed): {params['seed']} — đổi seed để sinh biến thể khác.")
+```
+
+## Cấu trúc & ma trận (minh hoạ)
+
+```{python}
+print("| Phần | Nội dung | Số câu | Điểm | Nhận xét |")
+print("|------|----------|--------|------|----------|")
+print(f"| I    | Áp suất chất lỏng | {params['num_mcq']} TN | 4.0 | Nhận biết, thông hiểu |")
+print("| II   | Áp suất khí quyển | 2 TL | 6.0 | Vận dụng |")
+```
+
+## Phần I: Trắc nghiệm
+
+```{python}
+for idx, q in enumerate(mcq_items, 1):
+    print(f"{idx}. {q['question']}")
+    for opt_idx, opt in enumerate(q['options']):
+        print(f"   {chr(65 + opt_idx)}. {opt}")
+    print()
+```
+
+## Phần II: Tự luận
+
+```{python}
+for idx, q in enumerate(essay_items, 1):
+    print(f"{idx}. {q['question']}")
+    print()
+```
+
+## Đáp án nhanh (ẩn/hiện qua tham số)
+
+```{python}
+if params["include_answers"]:
+    for idx, q in enumerate(mcq_items, 1):
+        print(f"- Câu {idx}: {q['answer']}")
+```
