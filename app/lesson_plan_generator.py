@@ -10,10 +10,16 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 from dataclasses import dataclass, field
 from datetime import date
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional
+
+# Ensure the parent directory is in the path for imports
+_script_dir = Path(__file__).parent.parent
+if str(_script_dir) not in sys.path:
+    sys.path.insert(0, str(_script_dir))
 
 
 @dataclass
@@ -217,7 +223,7 @@ def generate_markdown(config_path: Path, output_path: Path) -> None:
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Tạo kế hoạch bài dạy/bài giảng điện tử môn Khoa học Tự nhiên ở định dạng Markdown."
+        description="Tạo kế hoạch bài dạy/bài giảng điện tử môn Khoa học Tự nhiên ở định dạng Markdown hoặc Word."
     )
     parser.add_argument(
         "config",
@@ -229,7 +235,19 @@ def parse_args() -> argparse.Namespace:
         "--output",
         type=Path,
         default=None,
-        help="Đường dẫn tệp Markdown đầu ra. Mặc định cùng thư mục với tệp cấu hình.",
+        help="Đường dẫn tệp đầu ra (.md hoặc .docx). Mặc định cùng thư mục với tệp cấu hình.",
+    )
+    parser.add_argument(
+        "--format",
+        type=str,
+        choices=["markdown", "word", "both"],
+        default="markdown",
+        help="Định dạng xuất: markdown (mặc định), word (.docx), hoặc both (cả hai).",
+    )
+    parser.add_argument(
+        "--render-formulas",
+        action="store_true",
+        help="Render công thức LaTeX thành ảnh (cho PDF/Word).",
     )
     return parser.parse_args()
 
@@ -237,14 +255,57 @@ def parse_args() -> argparse.Namespace:
 def main() -> None:
     args = parse_args()
     config_path: Path = args.config
-    output_path: Path = args.output or config_path.with_suffix(".md")
+    output_format: str = args.format
 
     if not config_path.exists():
         raise FileNotFoundError(f"Không tìm thấy tệp cấu hình: {config_path}")
 
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    generate_markdown(config_path, output_path)
-    print(f"✅ Đã tạo kế hoạch bài dạy tại: {output_path}")
+    # Determine output paths
+    if args.output:
+        # User specified output path
+        if output_format == "both":
+            # Use the provided path for one format and derive the other
+            if args.output.suffix == ".docx":
+                word_output = args.output
+                markdown_output = args.output.with_suffix(".md")
+            else:
+                markdown_output = args.output
+                word_output = args.output.with_suffix(".docx")
+        elif output_format == "word":
+            word_output = (
+                args.output if args.output.suffix == ".docx" else args.output.with_suffix(".docx")
+            )
+            markdown_output = None
+        else:  # markdown
+            markdown_output = (
+                args.output if args.output.suffix == ".md" else args.output.with_suffix(".md")
+            )
+            word_output = None
+    else:
+        # Default output paths based on config file name
+        base_path = config_path.with_suffix("")
+        markdown_output = base_path.with_suffix(".md") if output_format in ["markdown", "both"] else None
+        word_output = base_path.with_suffix(".docx") if output_format in ["word", "both"] else None
+
+    # Generate markdown
+    if markdown_output:
+        markdown_output.parent.mkdir(parents=True, exist_ok=True)
+        generate_markdown(config_path, markdown_output)
+        print(f"✅ Đã tạo kế hoạch bài dạy Markdown tại: {markdown_output}")
+
+    # Generate Word document
+    if word_output:
+        try:
+            from app.word_exporter import export_to_word
+
+            word_output.parent.mkdir(parents=True, exist_ok=True)
+            config = _read_json(config_path)
+            export_to_word(config, word_output)
+            print(f"✅ Đã tạo kế hoạch bài dạy Word tại: {word_output}")
+        except ImportError as e:
+            print(f"⚠️  Không thể xuất Word: Thiếu thư viện python-docx. Chạy: pip install python-docx")
+        except Exception as e:
+            print(f"❌ Lỗi khi tạo file Word: {e}")
 
 
 if __name__ == "__main__":
