@@ -59,24 +59,45 @@ Bộ công cụ trong `tools/khtn_ai_editor/` cung cấp template Pandoc, XeLaTe
   ```
 ## Ứng dụng tạo kế hoạch bài dạy KHTN
 
-Thư mục `tools/lesson_planner/` chứa script Python hỗ trợ soạn giáo án/bài giảng điện tử
-và xuất ra file Markdown có thể nhúng công thức LaTeX.
+Script `app/lesson_plan_generator.py` hỗ trợ soạn giáo án/bài giảng điện tử từ file JSON
+và xuất ra file Markdown hoặc Word (.docx).
 
-### Cách chạy
+### Cài đặt dependencies
 
-1. (Tuỳ chọn) Tạo kế hoạch từ file JSON mẫu:
-   ```
-   cd tools/lesson_planner
-   python lesson_plan_generator.py --from-json sample_lesson_plan.json ke_hoach.md
-   ```
+```bash
+pip install -r requirements.txt
+```
 
-2. Hoặc nhập liệu tương tác trực tiếp trên terminal:
-   ```
-   cd tools/lesson_planner
-   python lesson_plan_generator.py --interactive ke_hoach.md
-   ```
+### Tính năng mới
 
-Script sẽ tạo file `.md` chứa đầy đủ cấu trúc mục tiêu, học liệu, hoạt động dạy học,
+- ✨ **Render công thức LaTeX thành ảnh**: Sử dụng Matplotlib để chuyển công thức LaTeX thành ảnh PNG chất lượng cao (300 DPI)
+- 📄 **Xuất file Word (.docx)**: Tạo file Word với công thức đã được render, phù hợp để chia sẻ và in ấn
+- 🔄 **Xuất nhiều định dạng**: Tạo cả Markdown và Word cùng lúc với tùy chọn `--format both`
+
+### Cách sử dụng
+
+#### Xuất file Markdown (mặc định)
+```bash
+python app/lesson_plan_generator.py samples/grade6_light_and_shadow.json -o outputs/lesson.md
+```
+
+#### Xuất file Word với công thức được render
+```bash
+python app/lesson_plan_generator.py samples/grade6_light_and_shadow.json \
+  --format word -o outputs/lesson.docx
+```
+
+#### Xuất cả Markdown và Word
+```bash
+python app/lesson_plan_generator.py samples/grade6_light_and_shadow.json \
+  --format both -o outputs/lesson.md
+```
+
+Xem hướng dẫn chi tiết trong `docs/LATEX_WORD_EXPORT.md`.
+
+### Định dạng file JSON
+
+Script sẽ tạo file chứa đầy đủ cấu trúc mục tiêu, học liệu, hoạt động dạy học,
 đánh giá... Các công thức viết dạng LaTeX (ví dụ `$F = ma$`) sẽ giữ nguyên trong
 file Markdown để sử dụng với các hệ thống hỗ trợ MathJax.
 
