@@ -123,9 +123,9 @@ class TimeseriesData:
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary representation for JSON serialization."""
         return {
-            "metadata": self.metadata.to_dict(),
-            "variables": [var.to_dict() for var in self.variables],
-            "timeseries": [point.to_dict() for point in self.timeseries],
+            "metadata": asdict(self.metadata),
+            "variables": [asdict(var) for var in self.variables],
+            "timeseries": [asdict(point) for point in self.timeseries],
         }
 
     def to_json(self, indent: int = 2) -> str:
