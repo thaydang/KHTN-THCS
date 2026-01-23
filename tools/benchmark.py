@@ -17,22 +17,29 @@ from app.lesson_plan_generator import build_markdown
 from app.timeseries_data import create_sample_timeseries
 
 
-def benchmark(name: str, func: Callable[[], Any], iterations: int = 100) -> None:
+def benchmark(name: str, func: Callable[[], Any], iterations: int = 100, setup: Callable[[], Any] = None) -> None:
     """Run a benchmark and print results.
     
     Args:
         name: Name of the benchmark
         func: Function to benchmark
         iterations: Number of iterations to run
+        setup: Optional setup function to run once before benchmarking
     """
     print(f"\n{'=' * 60}")
     print(f"Benchmark: {name}")
     print(f"Iterations: {iterations}")
     print(f"{'=' * 60}")
     
+    # Run setup if provided
+    setup_data = setup() if setup else None
+    
     start = time.time()
     for _ in range(iterations):
-        func()
+        if setup_data is not None:
+            func(setup_data)
+        else:
+            func()
     end = time.time()
     
     total_time = end - start
@@ -45,18 +52,21 @@ def benchmark(name: str, func: Callable[[], Any], iterations: int = 100) -> None
 
 def benchmark_timeseries_generation() -> None:
     """Benchmark timeseries data generation."""
-    data = create_sample_timeseries("Thí nghiệm", "Thiết bị", 1.0, 100)
+    create_sample_timeseries("Thí nghiệm", "Thiết bị", 1.0, 100)
 
 
-def benchmark_timeseries_serialization() -> None:
+def setup_timeseries_data():
+    """Setup function to create timeseries data once."""
+    return create_sample_timeseries("Thí nghiệm", "Thiết bị", 1.0, 100)
+
+
+def benchmark_timeseries_serialization(data) -> None:
     """Benchmark timeseries data serialization."""
-    data = create_sample_timeseries("Thí nghiệm", "Thiết bị", 1.0, 100)
     _ = data.to_dict()
 
 
-def benchmark_timeseries_validation() -> None:
+def benchmark_timeseries_validation(data) -> None:
     """Benchmark timeseries data validation."""
-    data = create_sample_timeseries("Thí nghiệm", "Thiết bị", 1.0, 100)
     _ = data.validate()
 
 
@@ -110,8 +120,16 @@ def main() -> int:
     
     # Timeseries benchmarks
     benchmark("Timeseries: Generation (100 points)", benchmark_timeseries_generation)
-    benchmark("Timeseries: Serialization (100 points)", benchmark_timeseries_serialization)
-    benchmark("Timeseries: Validation (100 points)", benchmark_timeseries_validation)
+    benchmark(
+        "Timeseries: Serialization (100 points)", 
+        benchmark_timeseries_serialization,
+        setup=setup_timeseries_data
+    )
+    benchmark(
+        "Timeseries: Validation (100 points)", 
+        benchmark_timeseries_validation,
+        setup=setup_timeseries_data
+    )
     
     # Lesson plan benchmarks
     benchmark("Lesson Plan: Simple", benchmark_lesson_plan_simple)
