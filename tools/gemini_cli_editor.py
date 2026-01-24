@@ -48,21 +48,13 @@ def read_files(paths: Iterable[str], max_chars: int) -> str:
         if not path.exists():
             pieces.append(f"<FILE path=\"{raw_path}\">Không tìm thấy tệp.</FILE>")
             continue
-        text = path.read_text(encoding="utf-8")
-        if len(text) > remaining:
-            text = text[:remaining]
+
+        # Read file efficiently: only read what we need, without exceeding max_chars
+        to_read = remaining if remaining > 0 else 0
+        with path.open("r", encoding="utf-8") as f:
+            text = f.read(to_read)
         remaining -= len(text)
-        pieces.append(
-            "\n".join(
-                [
-                    f"<FILE path=\"{raw_path}\">",
-                    text,
-                    "</FILE>",
-                ]
-            )
-        )
-        if remaining <= 0:
-            break
+        pieces.append(f"<FILE path=\"{raw_path}\">\n{text}\n</FILE>")
     return "\n".join(pieces)
 
 

@@ -50,13 +50,13 @@ class Activity:
             lines.append(f"- **Thời lượng**: {self.duration}")
         if self.goals:
             lines.append("- **Mục tiêu hoạt động**:")
-            lines.extend("  - " + goal for goal in self.goals)
+            lines.extend(f"  - {goal}" for goal in self.goals)
         if self.steps:
             lines.append("- **Tiến trình**:")
             lines.extend(step.to_markdown(indent=2) for step in self.steps)
         if self.digital_assets:
             lines.append("- **Học liệu/Bài giảng điện tử**:")
-            lines.extend("  - " + asset for asset in self.digital_assets)
+            lines.extend(f"  - {asset}" for asset in self.digital_assets)
         return "\n".join(lines)
 
 
