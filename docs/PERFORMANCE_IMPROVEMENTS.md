@@ -95,9 +95,8 @@ This represents excellent performance for typical use cases (lesson experiments 
 
 The following patterns were already optimized in the codebase:
 
-1. **Cached list access** (app/timeseries_tool.py): First and last elements are cached before use
-2. **Efficient filtering** (app/lesson_plan_generator.py): Single-pass list comprehensions
-3. **F-string formatting** (multiple files): Modern Python string formatting already in use
+1. **Efficient filtering** (app/lesson_plan_generator.py): Single-pass list comprehensions
+2. **F-string formatting** (multiple files): Modern Python string formatting already in use
 
 ## Testing
 
