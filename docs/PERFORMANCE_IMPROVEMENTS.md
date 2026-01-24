@@ -70,8 +70,9 @@ pieces.append(
 )
 
 # After (optimized)
+to_read = remaining if remaining > 0 else 0
 with path.open("r", encoding="utf-8") as f:
-    text = f.read(remaining) if remaining > 0 else ""
+    text = f.read(to_read)
 
 remaining -= len(text)
 pieces.append(f"<FILE path=\"{raw_path}\">\n{text}\n</FILE>")

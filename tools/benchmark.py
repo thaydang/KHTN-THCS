@@ -14,7 +14,7 @@ from typing import Callable, Any
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from app.lesson_plan_generator import build_markdown
-from app.timeseries_data import create_sample_timeseries
+from app.timeseries_data import create_sample_timeseries, TimeseriesData
 
 
 def benchmark(name: str, func: Callable[[], Any], iterations: int = 100, setup: Callable[[], Any] = None) -> None:
@@ -55,17 +55,17 @@ def benchmark_timeseries_generation() -> None:
     create_sample_timeseries("Thí nghiệm", "Thiết bị", 1.0, 100)
 
 
-def setup_timeseries_data():
+def setup_timeseries_data() -> TimeseriesData:
     """Setup function to create timeseries data once."""
     return create_sample_timeseries("Thí nghiệm", "Thiết bị", 1.0, 100)
 
 
-def benchmark_timeseries_serialization(data) -> None:
+def benchmark_timeseries_serialization(data: TimeseriesData) -> None:
     """Benchmark timeseries data serialization."""
     _ = data.to_dict()
 
 
-def benchmark_timeseries_validation(data) -> None:
+def benchmark_timeseries_validation(data: TimeseriesData) -> None:
     """Benchmark timeseries data validation."""
     _ = data.validate()
 
