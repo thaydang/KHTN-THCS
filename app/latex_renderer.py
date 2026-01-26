@@ -9,7 +9,7 @@ from __future__ import annotations
 import hashlib
 import io
 from pathlib import Path
-from typing import Optional
+from typing import Dict, Optional
 
 import matplotlib
 import matplotlib.pyplot as plt
@@ -23,16 +23,22 @@ matplotlib.use("Agg")
 class LatexRenderer:
     """Renders LaTeX formulas to images using Matplotlib."""
 
-    def __init__(self, output_dir: Optional[Path] = None, dpi: int = 300):
+    def __init__(self, output_dir: Optional[Path] = None, dpi: int = 300, max_cache_size: int = 128):
         """Initialize the LaTeX renderer.
 
         Args:
             output_dir: Directory to save rendered images. If None, uses 'outputs/formulas'
             dpi: Resolution of the output images (default: 300 for high quality)
+            max_cache_size: Maximum number of formulas to cache in memory (default: 128)
         """
         self.output_dir = output_dir or Path("outputs/formulas")
         self.output_dir.mkdir(parents=True, exist_ok=True)
         self.dpi = dpi
+        self.max_cache_size = max_cache_size
+        # Cache for in-memory byte rendering to avoid re-rendering same formulas
+        # Uses LRU eviction when cache exceeds max_cache_size
+        self._bytes_cache: Dict[str, bytes] = {}
+        self._cache_access_order: list = []  # Track access order for LRU eviction
 
     def _generate_filename(self, latex_expr: str) -> str:
         """Generate a unique filename for a LaTeX expression.
@@ -114,6 +120,9 @@ class LatexRenderer:
     def render_to_bytes(self, latex_expr: str) -> bytes:
         """Render a LaTeX expression to PNG bytes in memory.
 
+        Uses bounded LRU caching to avoid re-rendering the same formula multiple times,
+        while preventing unbounded memory growth in long-running applications.
+
         Args:
             latex_expr: LaTeX expression
 
@@ -130,6 +139,14 @@ class LatexRenderer:
         latex_expr = latex_expr.strip()
         if latex_expr.startswith("$") and latex_expr.endswith("$"):
             latex_expr = latex_expr[1:-1].strip()
+
+        # Check cache first
+        cache_key = f"{latex_expr}:{self.dpi}"
+        if cache_key in self._bytes_cache:
+            # Update LRU order: move to end (most recently used)
+            self._cache_access_order.remove(cache_key)
+            self._cache_access_order.append(cache_key)
+            return self._bytes_cache[cache_key]
 
         try:
             fig = plt.figure(figsize=(10, 2))
@@ -158,7 +175,17 @@ class LatexRenderer:
             plt.close(fig)
 
             buf.seek(0)
-            return buf.getvalue()
+            result = buf.getvalue()
+            
+            # Evict least recently used item if cache is full
+            if len(self._bytes_cache) >= self.max_cache_size:
+                lru_key = self._cache_access_order.pop(0)
+                del self._bytes_cache[lru_key]
+            
+            # Cache the result
+            self._bytes_cache[cache_key] = result
+            self._cache_access_order.append(cache_key)
+            return result
 
         except Exception as e:
             raise ValueError(f"Failed to render LaTeX expression: {e}") from e

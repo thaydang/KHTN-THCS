@@ -73,6 +73,8 @@ class TimeseriesData:
     metadata: Metadata
     variables: List[Variable]
     timeseries: List[TimeseriesDataPoint] = field(default_factory=list)
+    # Internal cache for to_dict() to avoid redundant conversions
+    _dict_cache: Optional[Dict[str, Any]] = field(default=None, init=False, repr=False)
 
     def validate(self) -> tuple[bool, Optional[str]]:
         """Validate the timeseries data against schema requirements.
@@ -121,12 +123,24 @@ class TimeseriesData:
         return True, None
 
     def to_dict(self) -> Dict[str, Any]:
-        """Convert to dictionary representation for JSON serialization."""
-        return {
+        """Convert to dictionary representation for JSON serialization.
+        
+        Uses internal caching to avoid redundant conversions when called multiple times.
+        
+        Note: The cache assumes the TimeseriesData object is immutable after creation.
+        If you modify the object's fields after calling to_dict(), the cached result
+        will be stale. For best performance, treat TimeseriesData instances as immutable.
+        """
+        if self._dict_cache is not None:
+            return self._dict_cache
+            
+        result = {
             "metadata": asdict(self.metadata),
             "variables": [asdict(var) for var in self.variables],
             "timeseries": [asdict(point) for point in self.timeseries],
         }
+        self._dict_cache = result
+        return result
 
     def to_json(self, indent: int = 2) -> str:
         """Convert to JSON string."""
