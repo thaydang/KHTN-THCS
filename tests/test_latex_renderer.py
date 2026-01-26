@@ -87,6 +87,40 @@ class LatexRendererTests(unittest.TestCase):
         self.assertEqual(path1, path2)
         self.assertEqual(mtime1, mtime2)
 
+    def test_render_to_bytes_caching(self):
+        """Test that render_to_bytes() caches results in memory."""
+        renderer = LatexRenderer(output_dir=self.test_dir)
+        latex_expr = "E = mc^2"
+
+        # First render
+        bytes1 = renderer.render_to_bytes(latex_expr)
+        
+        # Second render of same formula
+        bytes2 = renderer.render_to_bytes(latex_expr)
+
+        # Should be the same cached object (same identity)
+        self.assertIs(bytes1, bytes2, "render_to_bytes() should return cached result")
+        
+        # Verify it's valid PNG data
+        self.assertTrue(bytes1.startswith(b"\x89PNG"))
+
+    def test_render_to_bytes_caching_different_dpi(self):
+        """Test that cache considers DPI in the cache key."""
+        renderer1 = LatexRenderer(output_dir=self.test_dir, dpi=150)
+        renderer2 = LatexRenderer(output_dir=self.test_dir, dpi=300)
+        latex_expr = "a + b = c"
+
+        # Render with different DPI
+        bytes1 = renderer1.render_to_bytes(latex_expr)
+        bytes2 = renderer2.render_to_bytes(latex_expr)
+
+        # Should be different objects (different DPI)
+        self.assertIsNot(bytes1, bytes2, "Different DPI should produce different cached results")
+        
+        # But both should be valid
+        self.assertTrue(bytes1.startswith(b"\x89PNG"))
+        self.assertTrue(bytes2.startswith(b"\x89PNG"))
+
     def test_convenience_functions(self):
         """Test convenience functions."""
         latex_expr = r"\nabla n = \frac{\Delta n}{\Delta x}"
