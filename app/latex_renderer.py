@@ -9,7 +9,7 @@ from __future__ import annotations
 import hashlib
 import io
 from pathlib import Path
-from typing import Optional
+from typing import Dict, Optional
 
 import matplotlib
 import matplotlib.pyplot as plt
@@ -33,6 +33,8 @@ class LatexRenderer:
         self.output_dir = output_dir or Path("outputs/formulas")
         self.output_dir.mkdir(parents=True, exist_ok=True)
         self.dpi = dpi
+        # Cache for in-memory byte rendering to avoid re-rendering same formulas
+        self._bytes_cache: Dict[str, bytes] = {}
 
     def _generate_filename(self, latex_expr: str) -> str:
         """Generate a unique filename for a LaTeX expression.
@@ -114,6 +116,9 @@ class LatexRenderer:
     def render_to_bytes(self, latex_expr: str) -> bytes:
         """Render a LaTeX expression to PNG bytes in memory.
 
+        Uses caching to avoid re-rendering the same formula multiple times,
+        improving performance when the same formula appears in multiple locations.
+
         Args:
             latex_expr: LaTeX expression
 
@@ -130,6 +135,11 @@ class LatexRenderer:
         latex_expr = latex_expr.strip()
         if latex_expr.startswith("$") and latex_expr.endswith("$"):
             latex_expr = latex_expr[1:-1].strip()
+
+        # Check cache first
+        cache_key = f"{latex_expr}:{self.dpi}"
+        if cache_key in self._bytes_cache:
+            return self._bytes_cache[cache_key]
 
         try:
             fig = plt.figure(figsize=(10, 2))
@@ -158,7 +168,11 @@ class LatexRenderer:
             plt.close(fig)
 
             buf.seek(0)
-            return buf.getvalue()
+            result = buf.getvalue()
+            
+            # Cache the result
+            self._bytes_cache[cache_key] = result
+            return result
 
         except Exception as e:
             raise ValueError(f"Failed to render LaTeX expression: {e}") from e

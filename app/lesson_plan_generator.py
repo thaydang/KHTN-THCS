@@ -78,10 +78,9 @@ def _coerce_activities(raw_activities: Iterable[Dict[str, Any]]) -> List[Activit
     activities: List[Activity] = []
     for activity in raw_activities:
         steps = _coerce_steps(activity.get("steps", []))
-        goals = [goal for goal in activity.get("goals", []) if goal]
-        digital_assets = [
-            asset for asset in activity.get("digital_assets", []) if asset
-        ]
+        # Use filter() for better performance and memory efficiency
+        goals = list(filter(None, activity.get("goals", [])))
+        digital_assets = list(filter(None, activity.get("digital_assets", [])))
         activities.append(
             Activity(
                 title=activity.get("title", "Hoạt động"),
@@ -95,7 +94,8 @@ def _coerce_activities(raw_activities: Iterable[Dict[str, Any]]) -> List[Activit
 
 
 def _format_bullet_section(title: str, items: Iterable[str]) -> Optional[str]:
-    filtered = [item.strip() for item in items if item]
+    # Use filter for better performance
+    filtered = [item.strip() for item in filter(None, items)]
     if not filtered:
         return None
     lines = [f"## {title}"]

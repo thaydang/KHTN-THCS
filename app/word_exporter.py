@@ -22,6 +22,9 @@ from app.latex_renderer import LatexRenderer
 class WordExporter:
     """Export lesson plans to Word (.docx) format."""
 
+    # Compile regex pattern once at class level for performance
+    _LATEX_PATTERN = re.compile(r"\$([^\$]+)\$")
+
     def __init__(self, output_dir: Optional[Path] = None):
         """Initialize the Word exporter.
 
@@ -238,59 +241,20 @@ class WordExporter:
 
             doc.add_paragraph()  # Add spacing
 
-    def _process_latex_in_text(self, doc: Document, text: str) -> bool:
-        """Process text containing LaTeX expressions and add as paragraph with images.
-
-        Args:
-            doc: Word document
-            text: Text that may contain LaTeX expressions like $...$
-
-        Returns:
-            True if LaTeX was found and processed, False otherwise
-        """
-        # Find all LaTeX expressions in the text
-        latex_pattern = r"\$([^\$]+)\$"
-        matches = list(re.finditer(latex_pattern, text))
-
-        if not matches:
-            return False
-
-        # Create a paragraph and add text with images
-        para = doc.add_paragraph(style="List Bullet")
-        last_end = 0
-
-        for match in matches:
-            # Add text before the LaTeX
-            if match.start() > last_end:
-                para.add_run(text[last_end : match.start()])
-
-            # Render and add LaTeX image
-            latex_expr = match.group(1)
-            try:
-                image_path = self.latex_renderer.render_to_file(latex_expr)
-                run = para.add_run()
-                run.add_picture(str(image_path), height=Inches(0.3))
-            except Exception:
-                # Fallback to text
-                para.add_run(f"${latex_expr}$")
-
-            last_end = match.end()
-
-        # Add remaining text
-        if last_end < len(text):
-            para.add_run(text[last_end:])
-
-        return True
-
-    def _add_text_with_latex(self, paragraph, text: str) -> None:
+    def _add_text_with_latex(
+        self, paragraph, text: str, image_height: float = 0.25
+    ) -> None:
         """Add text to an existing paragraph, replacing LaTeX with images.
+
+        Consolidated method to avoid code duplication. Uses precompiled regex pattern
+        for better performance.
 
         Args:
             paragraph: Word paragraph object
-            text: Text that may contain LaTeX expressions
+            text: Text that may contain LaTeX expressions like $...$
+            image_height: Height of LaTeX images in inches (default: 0.25)
         """
-        latex_pattern = r"\$([^\$]+)\$"
-        matches = list(re.finditer(latex_pattern, text))
+        matches = list(self._LATEX_PATTERN.finditer(text))
 
         if not matches:
             paragraph.add_run(text)
@@ -307,7 +271,7 @@ class WordExporter:
             try:
                 image_path = self.latex_renderer.render_to_file(latex_expr)
                 run = paragraph.add_run()
-                run.add_picture(str(image_path), height=Inches(0.25))
+                run.add_picture(str(image_path), height=Inches(image_height))
             except Exception:
                 paragraph.add_run(f"${latex_expr}$")
 
@@ -316,6 +280,28 @@ class WordExporter:
         # Add remaining text
         if last_end < len(text):
             paragraph.add_run(text[last_end:])
+
+    def _process_latex_in_text(self, doc: Document, text: str) -> bool:
+        """Process text containing LaTeX expressions and add as paragraph with images.
+
+        This is a convenience wrapper around _add_text_with_latex for creating
+        new bullet paragraphs.
+
+        Args:
+            doc: Word document
+            text: Text that may contain LaTeX expressions like $...$
+
+        Returns:
+            True if LaTeX was found and processed, False otherwise
+        """
+        # Check if text contains LaTeX before creating paragraph
+        if not self._LATEX_PATTERN.search(text):
+            return False
+
+        # Create a paragraph and add text with images
+        para = doc.add_paragraph(style="List Bullet")
+        self._add_text_with_latex(para, text, image_height=0.3)
+        return True
 
 
 def export_to_word(config: Dict[str, Any], output_path: Path) -> None:
