@@ -121,6 +121,42 @@ class LatexRendererTests(unittest.TestCase):
         self.assertTrue(bytes1.startswith(b"\x89PNG"))
         self.assertTrue(bytes2.startswith(b"\x89PNG"))
 
+    def test_render_to_bytes_lru_eviction(self):
+        """Test that LRU cache evicts least recently used items when full."""
+        # Create renderer with small cache size
+        renderer = LatexRenderer(output_dir=self.test_dir, max_cache_size=3)
+        
+        # Render 3 formulas to fill cache
+        bytes1 = renderer.render_to_bytes("a = 1")
+        bytes2 = renderer.render_to_bytes("b = 2")
+        bytes3 = renderer.render_to_bytes("c = 3")
+        
+        # All should be cached
+        self.assertEqual(len(renderer._bytes_cache), 3)
+        
+        # Access first formula again to make it recently used
+        bytes1_again = renderer.render_to_bytes("a = 1")
+        self.assertIs(bytes1, bytes1_again, "First formula should still be cached")
+        
+        # Add a 4th formula, should evict the least recently used (b = 2)
+        bytes4 = renderer.render_to_bytes("d = 4")
+        
+        # Cache should still have 3 items
+        self.assertEqual(len(renderer._bytes_cache), 3)
+        
+        # Formula 2 should have been evicted (it was least recently used)
+        # Check it's no longer in cache
+        cache_key_b = "b = 2:300"  # formula:dpi format
+        self.assertNotIn(cache_key_b, renderer._bytes_cache, "Formula 2 should be evicted")
+        
+        # Formulas 1, 3, and 4 should still be in cache
+        cache_key_a = "a = 1:300"
+        cache_key_c = "c = 3:300"
+        cache_key_d = "d = 4:300"
+        self.assertIn(cache_key_a, renderer._bytes_cache, "Formula 1 should be cached")
+        self.assertIn(cache_key_c, renderer._bytes_cache, "Formula 3 should be cached")
+        self.assertIn(cache_key_d, renderer._bytes_cache, "Formula 4 should be cached")
+
     def test_convenience_functions(self):
         """Test convenience functions."""
         latex_expr = r"\nabla n = \frac{\Delta n}{\Delta x}"

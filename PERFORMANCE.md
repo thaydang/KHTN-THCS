@@ -37,21 +37,28 @@ class WordExporter:
 
 **Issue:** `render_to_bytes()` was rendering the same formula multiple times without caching, unlike `render_to_file()` which cached to disk.
 
-**Solution:** Added in-memory dictionary cache `_bytes_cache` that caches rendered formulas using a composite key of expression and DPI.
+**Solution:** Added bounded in-memory LRU cache `_bytes_cache` that caches rendered formulas using a composite key of expression and DPI, with automatic eviction when cache limit is reached (default: 128 formulas).
 
 ```python
-def __init__(self, output_dir: Optional[Path] = None, dpi: int = 300):
+def __init__(self, output_dir: Optional[Path] = None, dpi: int = 300, max_cache_size: int = 128):
     # ...
     self._bytes_cache: Dict[str, bytes] = {}
+    self._cache_access_order: list = []  # Track access order for LRU eviction
 
 def render_to_bytes(self, latex_expr: str) -> bytes:
     cache_key = f"{latex_expr}:{self.dpi}"
     if cache_key in self._bytes_cache:
+        # Update LRU order
+        self._cache_access_order.remove(cache_key)
+        self._cache_access_order.append(cache_key)
         return self._bytes_cache[cache_key]
-    # ... render and cache result
+    # ... render, evict LRU if needed, and cache result
 ```
 
-**Impact:** Avoids re-rendering identical formulas, significantly improving performance for documents with repeated formulas.
+**Impact:** 
+- Avoids re-rendering identical formulas
+- Bounded cache prevents memory exhaustion in long-running applications
+- LRU eviction ensures most frequently used formulas stay cached
 
 ### 4. Lesson Plan Generator: Optimized Filtering (lesson_plan_generator.py)
 
@@ -107,7 +114,7 @@ Lesson Plan: Complex (5 activities): 18,881 ops/sec (comparable)
 ## Testing
 
 All optimizations were validated with:
-- **Unit Tests**: 23 tests passing, including 4 new tests for caching behavior
+- **Unit Tests**: 24 tests passing, including 5 new tests for caching behavior
 - **Integration Tests**: Verified lesson plan generation (Markdown and Word) still works correctly
 - **Benchmark Tests**: Confirmed performance improvements using `tools/benchmark.py`
 
@@ -117,6 +124,7 @@ All optimizations were validated with:
 2. `test_to_json_uses_cached_dict` - Verifies JSON serialization benefits from cache
 3. `test_render_to_bytes_caching` - Verifies LaTeX renderer caches byte results
 4. `test_render_to_bytes_caching_different_dpi` - Verifies cache keys include DPI
+5. `test_render_to_bytes_lru_eviction` - Verifies LRU eviction prevents unbounded memory growth
 
 ## Best Practices Applied
 

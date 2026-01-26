@@ -76,10 +76,6 @@ class TimeseriesData:
     # Internal cache for to_dict() to avoid redundant conversions
     _dict_cache: Optional[Dict[str, Any]] = field(default=None, init=False, repr=False)
 
-    def __post_init__(self):
-        """Initialize internal cache."""
-        self._dict_cache = None
-
     def validate(self) -> tuple[bool, Optional[str]]:
         """Validate the timeseries data against schema requirements.
 
@@ -130,8 +126,10 @@ class TimeseriesData:
         """Convert to dictionary representation for JSON serialization.
         
         Uses internal caching to avoid redundant conversions when called multiple times.
-        Cache is invalidated if the object is modified (though dataclass fields should be
-        treated as immutable after creation for best performance).
+        
+        Note: The cache assumes the TimeseriesData object is immutable after creation.
+        If you modify the object's fields after calling to_dict(), the cached result
+        will be stale. For best performance, treat TimeseriesData instances as immutable.
         """
         if self._dict_cache is not None:
             return self._dict_cache
